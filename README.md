@@ -1,4 +1,4 @@
-# @lakshaysharma684/rich-text-editor
+# @lakshaykumar/rich-text-editor
 
 A lightweight, modular, and **dependency-free** Rich Text Editor built with modern JavaScript (ES6+).
 
@@ -17,7 +17,7 @@ Designed for ease of use and performance, this editor provides a clean WYSIWYG e
 You can install the package via npm:
 
 ```bash
-npm install @lakshaysharma684/rich-text-editor
+npm install @lakshaykumar/rich-text-editor
 ```
 
 ## Usage
@@ -27,19 +27,19 @@ Start by including the core styles. You can import them in your JS (if your bund
 
 **In JavaScript/React/Vue:**
 ```javascript
-import '@lakshaysharma684/rich-text-editor/src/styles/rte.css';
+import '@lakshaykumar/rich-text-editor/src/styles/rte.css';
 ```
 
 **In HTML:**
 ```html
-<link rel="stylesheet" href="./node_modules/@lakshaysharma684/rich-text-editor/src/styles/rte.css">
+<link rel="stylesheet" href="./node_modules/@lakshaykumar/rich-text-editor/src/styles/rte.css">
 ```
 
 ### 2. Initialize the Editor
 Import the `RichTextEditor` class and initialize it on a target element.
 
 ```javascript
-import RichTextEditor from '@lakshaysharma684/rich-text-editor';
+import RichTextEditor from '@lakshaykumar/rich-text-editor';
 
 // Initialize with a selector or DOM element
 const editor = new RichTextEditor('#my-editor-container', {
@@ -74,5 +74,5 @@ You are free to use, modify, and distribute this software in any project, commer
 When using this package, please keep the package namespace `@lakshaysharma684/rich-text-editor` to ensure proper credit is maintained.
 
 ```javascript
-import RichTextEditor from '@lakshaysharma684/rich-text-editor';
+import RichTextEditor from '@lakshaykumar/rich-text-editor';
 ```

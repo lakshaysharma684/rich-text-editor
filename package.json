@@ -1,5 +1,5 @@
 {
-    "name": "@lakshaysharma684/rich-text-editor",
+    "name": "@lakshaykumar/rich-text-editor",
     "version": "1.0.0",
     "description": "A lightweight, modular, and dependency-free Rich Text Editor built with modern JavaScript.",
     "main": "src/editor/RichTextEditor.js",
