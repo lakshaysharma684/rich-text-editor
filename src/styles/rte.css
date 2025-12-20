@@ -1,0 +1,706 @@
+/* Main Container Variables */
+:root {
+  --rte-border-color: #e2e8f0;
+  --rte-bg-color: #ffffff;
+  --rte-toolbar-bg: #f8fafc;
+  --rte-text-color: #334155;
+  --rte-primary-color: #3b82f6;
+  --rte-hover-color: #e2e8f0;
+  --rte-font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+/* 
+ * RTE Container 
+ * Wrapper for the whole editor component 
+ */
+.rte-wrapper {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--rte-border-color);
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--rte-bg-color);
+  font-family: var(--rte-font-family);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  max-width: 800px;
+  /* Default max-width, can be overridden */
+  margin: 0 auto;
+}
+
+/* 
+ * Toolbar Styles
+ */
+.rte-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 10px 12px;
+  background-color: rgba(255, 255, 255, 0.95);
+  /* Semi-transparent */
+  backdrop-filter: blur(8px);
+  /* Glassmorphism */
+  border-bottom: 1px solid var(--rte-border-color);
+  align-items: center;
+  position: sticky;
+  /* Sticky Header */
+  top: 0;
+  z-index: 50;
+  /* Above content */
+}
+
+.rte-toolbar-divider {
+  width: 1px;
+  height: 24px;
+  background-color: #cbd5e1;
+  margin: 0 6px;
+  align-self: center;
+}
+
+/* Color Picker Wrapper */
+.rte-color-wrapper {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.rte-color-wrapper input[type="color"] {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  /* Invisible but clickable */
+  cursor: pointer;
+  z-index: 10;
+}
+
+.rte-toolbar-btn {
+  width: 34px;
+  /* Slightly wider for comfort */
+  height: 34px;
+  border: none;
+  background: transparent;
+  border-radius: 6px;
+  cursor: pointer;
+  color: #64748b;
+  /* Slate-500 */
+  font-size: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.rte-toolbar-btn:hover {
+  background-color: #f1f5f9;
+  /* Slate-100 */
+  color: #1e293b;
+}
+
+.rte-toolbar-btn.active {
+  background-color: #dbeafe;
+  /* Blue-100 */
+  color: #2563eb;
+  /* Blue-600 */
+}
+
+.rte-toolbar-divider {
+  width: 1px;
+  height: 20px;
+  background-color: #cbd5e1;
+  margin: 0 4px;
+}
+
+/* 
+ * Editor & Content Area Shared Styles
+ * These styles apply to BOTH the editable area and the static preview 
+ */
+.rte-content {
+  padding: 24px;
+  min-height: 200px;
+  outline: none;
+  color: var(--rte-text-color);
+  line-height: 1.6;
+  font-size: 16px;
+  overflow-y: auto;
+}
+
+/* Placeholder for the editor when empty */
+.rte-content:empty::before {
+  content: attr(data-placeholder);
+  color: #94a3b8;
+  pointer-events: none;
+  display: block;
+}
+
+/* Typography Defaults */
+.rte-content h1,
+.rte-content h2,
+.rte-content h3 {
+  color: #1e293b;
+  margin-top: 1.5em;
+  margin-bottom: 0.5em;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.rte-content h1 {
+  font-size: 2.25em;
+  border-bottom: 1px solid #e2e8f0;
+  padding-bottom: 0.3em;
+}
+
+.rte-content h2 {
+  font-size: 1.75em;
+}
+
+.rte-content h3 {
+  font-size: 1.5em;
+}
+
+.rte-content p {
+  margin-bottom: 1em;
+}
+
+/* Lists */
+.rte-content ul,
+.rte-content ol {
+  padding-left: 1.5em;
+  margin-bottom: 1em;
+}
+
+.rte-content li {
+  margin-bottom: 0.25em;
+}
+
+/* Blockquotes */
+.rte-content blockquote {
+  border-left: 4px solid var(--rte-primary-color);
+  padding-left: 16px;
+  margin: 1.5em 0;
+  color: #475569;
+  font-style: italic;
+  background: #f8fafc;
+  padding: 12px 16px;
+  border-radius: 0 4px 4px 0;
+}
+
+/* Links */
+.rte-content a {
+  color: var(--rte-primary-color);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+/* Images */
+.rte-content img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 1em auto;
+  border-radius: 6px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+/* Selection state for images in editor */
+.rte-content img::selection {
+  background: transparent;
+}
+
+/* Inline Quote */
+.rte-content q {
+  font-style: italic;
+  background-color: #f1f5f9;
+  padding: 2px 4px;
+  border-radius: 4px;
+  color: #475569;
+}
+
+.rte-content q::before,
+.rte-content q::after {
+  content: '"';
+  color: #94a3b8;
+  font-weight: bold;
+}
+
+/* Inline Quote */
+.rte-content q {
+  font-style: italic;
+  background-color: #f1f5f9;
+  padding: 2px 4px;
+  border-radius: 4px;
+  color: #475569;
+}
+
+.rte-content q::before,
+.rte-content q::after {
+  content: '"';
+  color: #94a3b8;
+  font-weight: bold;
+}
+
+/* Floating Context Menu */
+.rte-floating-menu {
+  position: absolute;
+  z-index: 1000;
+  background: #1e293b;
+  border-radius: 6px;
+  padding: 4px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.rte-floating-menu button {
+  background: transparent;
+  border: none;
+  color: #fff;
+  padding: 4px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.rte-floating-menu button:hover {
+  background: #334155;
+}
+
+.rte-menu-url {
+  color: #cbd5e1;
+  font-size: 12px;
+  padding: 0 8px;
+  max-width: 150px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  border-right: 1px solid #475569;
+}
+
+/* Horizontal Rule */
+.rte-content hr {
+  border: 0;
+  border-top: 1px solid #cbd5e1;
+  margin: 2em 0;
+}
+
+/* Code Block */
+.rte-content pre {
+  background: #1e293b;
+  color: #f8fafc;
+  padding: 16px;
+  border-radius: 6px;
+  overflow-x: auto;
+  font-family: 'Fira Code', 'Courier New', monospace;
+  font-size: 14px;
+  margin: 1.5em 0;
+}
+
+/* Color Picker in Toolbar */
+.rte-color-picker {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+
+.rte-color-picker:hover {
+  background-color: var(--rte-hover-color);
+}
+
+.rte-color-picker input[type="color"] {
+  width: 20px;
+  height: 20px;
+  border: none;
+  background: none;
+  background: none;
+  cursor: pointer;
+  padding: 0;
+}
+
+/* Toolbar Select Dropdown */
+.rte-select-wrapper {
+  position: relative;
+  display: inline-flex;
+  margin-right: 4px;
+}
+
+.rte-toolbar-select {
+  appearance: none;
+  -webkit-appearance: none;
+  background-color: transparent;
+  border: 1px solid #cbd5e1;
+  border-radius: 4px;
+  padding: 4px 24px 4px 8px;
+  font-size: 13px;
+  color: #334155;
+  height: 32px;
+  cursor: pointer;
+  outline: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23334155' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 4px center;
+  background-size: 14px;
+  min-width: 90px;
+}
+
+.rte-toolbar-select:hover {
+  border-color: #94a3b8;
+  background-color: #f8fafc;
+}
+
+/* Full Screen Mode */
+.rte-wrapper.rte-fullscreen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  max-width: none;
+  /* Override default constraint */
+  margin: 0;
+  z-index: 9999;
+  border-radius: 0;
+  border: none;
+  display: flex;
+  /* Flexbox to manage height */
+  flex-direction: column;
+}
+
+.rte-wrapper.rte-fullscreen .rte-content,
+.rte-wrapper.rte-fullscreen .rte-source-view {
+  height: auto;
+  flex: 1;
+  /* Take remaining space */
+  overflow-y: auto;
+  /* Scroll internally */
+}
+
+/* Source Code View */
+.rte-source-view {
+  display: none;
+  /* Hidden by default */
+  width: 100%;
+  box-sizing: border-box;
+  padding: 24px;
+  min-height: 200px;
+  /* Match rte-content */
+  border: none;
+  resize: none;
+  font-family: 'Fira Code', monospace;
+  font-size: 14px;
+  color: #334155;
+  background: #f8fafc;
+  outline: none;
+  line-height: 1.6;
+}
+
+.rte-wrapper.rte-fullscreen .rte-source-view {
+  height: calc(100vh - 50px - 40px);
+}
+
+/* Subscript/Superscript */
+.rte-content sub,
+.rte-content sup {
+  font-size: 75%;
+  line-height: 0;
+  position: relative;
+  vertical-align: baseline;
+}
+
+.rte-content sup {
+  top: -0.5em;
+}
+
+.rte-content sub {
+  bottom: -0.25em;
+}
+
+/* Alignment Helper Classes (if needed by logical mapping, though execCommand uses styles mostly) */
+.rte-content[style*="text-align: center"] {
+  text-align: center;
+}
+
+.rte-content[style*="text-align: right"] {
+  text-align: right;
+}
+
+.rte-content[style*="text-align: justify"] {
+  text-align: justify;
+}
+
+/* 
+ * =========================================
+ * Dark Mode Theme 
+ * =========================================
+ */
+.rte-dark-mode {
+  --rte-bg-color: #0f172a;
+  /* Slate-900 */
+  --rte-text-color: #e2e8f0;
+  /* Slate-200 */
+  --rte-border-color: #334155;
+  /* Slate-700 */
+  --rte-toolbar-bg: #1e293b;
+  /* Slate-800 */
+  --rte-hover-color: #334155;
+  /* Slate-700 */
+}
+
+/* Adjustments for specific elements in Dark Mode */
+.rte-wrapper.rte-dark-mode .rte-toolbar {
+  background-color: rgba(30, 41, 59, 0.95);
+  /* Dark Glass */
+  border-bottom: 1px solid var(--rte-border-color);
+}
+
+.rte-wrapper.rte-dark-mode .rte-toolbar-btn {
+  color: #94a3b8;
+  /* Muted text */
+}
+
+.rte-wrapper.rte-dark-mode .rte-toolbar-btn:hover {
+  background-color: var(--rte-hover-color);
+  color: #f8fafc;
+}
+
+.rte-wrapper.rte-dark-mode .rte-toolbar-btn.active {
+  background-color: #1d4ed8;
+  /* Darker Blue */
+  color: #ffffff;
+}
+
+.rte-wrapper.rte-dark-mode .rte-content blockquote {
+  background: #1e293b;
+  color: #cbd5e1;
+  border-left-color: #60a5fa;
+}
+
+.rte-wrapper.rte-dark-mode .rte-content pre {
+  background: #020617;
+  /* Very Dark for Code */
+  border: 1px solid #334155;
+}
+
+.rte-wrapper.rte-dark-mode .rte-statusbar {
+  background: #1e293b;
+  border-top: 1px solid #334155;
+  color: #94a3b8;
+}
+
+.rte-wrapper.rte-dark-mode .rte-toolbar-select {
+  color: #e2e8f0;
+  border-color: #475569;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23e2e8f0' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+}
+
+/* Table Picker Modal */
+.rte-table-picker-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10003;
+  /* Above fullscreen (9999) + Emoji (10002) */
+}
+
+.rte-modal-content {
+  background: #ffffff;
+  padding: 24px;
+  border-radius: 8px;
+  width: 300px;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  font-family: var(--rte-font-family);
+}
+
+.rte-modal-content h3 {
+  margin-top: 0;
+  margin-bottom: 16px;
+  font-size: 18px;
+  color: var(--rte-text-color);
+}
+
+.rte-form-group {
+  margin-bottom: 16px;
+}
+
+.rte-form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 14px;
+  color: #64748b;
+}
+
+.rte-form-group input[type="number"] {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #cbd5e1;
+  border-radius: 4px;
+  font-size: 14px;
+  box-sizing: border-box;
+}
+
+.rte-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.rte-modal-actions button {
+  padding: 8px 16px;
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.rte-btn-cancel {
+  background: transparent;
+  color: #64748b;
+}
+
+.rte-btn-cancel:hover {
+  background: #f1f5f9;
+}
+
+.rte-btn-insert {
+  background: var(--rte-primary-color);
+  color: #fff;
+}
+
+.rte-btn-insert:hover {
+  background: #2563eb;
+}
+
+/* Dark Mode Modal */
+.rte-wrapper.rte-dark-mode .rte-modal-content {
+  background: #1e293b;
+}
+
+.rte-wrapper.rte-dark-mode .rte-modal-content h3 {
+  color: #e2e8f0;
+}
+
+/* Table Grid Picker */
+.rte-table-modal-content {
+  width: auto;
+  min-width: 240px;
+}
+
+.rte-table-grid {
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  gap: 2px;
+  margin-bottom: 12px;
+}
+
+.rte-grid-cell {
+  width: 18px;
+  height: 18px;
+  border: 1px solid #cbd5e1;
+  border-radius: 2px;
+  background: #f8fafc;
+  cursor: pointer;
+}
+
+.rte-grid-cell.active {
+  background: var(--rte-primary-color);
+  border-color: #2563eb;
+}
+
+.rte-grid-label {
+  text-align: center;
+  font-weight: 600;
+  color: var(--rte-text-color);
+  margin-bottom: 8px;
+}
+
+/* Dark Mode Grid */
+.rte-wrapper.rte-dark-mode .rte-grid-cell {
+  background: #0f172a;
+  border-color: #334155;
+}
+
+.rte-wrapper.rte-dark-mode .rte-grid-cell.active {
+  background: #3b82f6;
+  /* Blue-500 */
+  border-color: #60a5fa;
+}
+
+/* Search & Replace */
+.rte-search-bar {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  font-family: sans-serif;
+  z-index: 2000;
+  min-width: 250px;
+}
+
+.rte-search-inputs {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.rte-search-inputs input {
+  padding: 6px;
+  border: 1px solid #cbd5e1;
+  border-radius: 4px;
+}
+
+.rte-search-actions {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.rte-search-actions button {
+  padding: 4px 8px;
+  border: 1px solid #cbd5e1;
+  background: #f1f5f9;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.rte-search-actions button:hover {
+  background: #e2e8f0;
+}
+
+#rte-search-stats {
+  font-size: 11px;
+  color: #64748b;
+  text-align: right;
+  margin-top: 4px;
+}
+
+.rte-search-match {
+  background-color: #fde047;
+  /* Yellow */
+}
+
+.rte-search-match.active {
+  background-color: #f97316;
+  /* Orange */
+  color: white;
+}

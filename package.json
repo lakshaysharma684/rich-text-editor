@@ -1,0 +1,32 @@
+{
+    "name": "@lakshaysharma684/rich-text-editor",
+    "version": "1.0.0",
+    "description": "A lightweight, modular, and dependency-free Rich Text Editor built with modern JavaScript.",
+    "main": "src/editor/RichTextEditor.js",
+    "type": "module",
+    "files": [
+        "src",
+        "README.md",
+        "LICENSE"
+    ],
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "keywords": [
+        "rich-text-editor",
+        "wysiwyg",
+        "editor",
+        "javascript",
+        "esm"
+    ],
+    "author": "Lakshay Kumar",
+    "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/lakshaysharma684/rich-text-editor.git"
+    },
+    "bugs": {
+        "url": "https://github.com/lakshaysharma684/rich-text-editor/issues"
+    },
+    "homepage": "https://github.com/lakshaysharma684/rich-text-editor#readme"
+}

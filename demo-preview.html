@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Article Preview (Read Only)</title>
+    <link rel="stylesheet" href="src/styles/rte.css">
+    <style>
+        body {
+            font-family: sans-serif;
+            padding: 20px;
+            background: #fff;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            color: #334155;
+            margin-bottom: 40px;
+        }
+
+        .article-card {
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Static Content Preview</h1>
+
+        <div class="article-card">
+            <!-- 
+                This container uses the SAME class 'rte-content' 
+                to ensure it looks exactly like it did in the editor.
+            -->
+            <div class="rte-content">
+                <h1>The Future of Web Development</h1>
+                <p>Web development is evolving rapidly. Visual editors are becoming more powerful than ever.</p>
+
+                <blockquote>
+                    "Simplicity is the ultimate sophistication." - Leonardo da Vinci
+                </blockquote>
+
+                <h3>Key Features Required:</h3>
+                <ul>
+                    <li>Performance</li>
+                    <li>Accessibility</li>
+                    <li><strong>User Experience</strong></li>
+                </ul>
+
+                <p>Here is an example of an image that might have been uploaded:</p>
+                <!-- Using a placeholder for demo purposes since we don't have a real base64 image here yet -->
+                <img src="https://via.placeholder.com/600x300.png?text=Preview+Image+Example" alt="Placeholder">
+
+                <p>End of article.</p>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
