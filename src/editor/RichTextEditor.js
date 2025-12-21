@@ -7,6 +7,11 @@ import EmojiPicker from './EmojiPicker.js';
 import TablePicker from './TablePicker.js';
 import ImageResizer from './ImageResizer.js';
 import SearchReplace from './SearchReplace.js';
+import AutoSave from './AutoSave.js';
+import LinkTooltip from './LinkTooltip.js';
+import SlashMenu from './SlashMenu.js';
+import CodeHighlighter from './CodeHighlighter.js';
+import LinkPicker from './LinkPicker.js';
 
 
 export default class RichTextEditor {
@@ -18,6 +23,8 @@ export default class RichTextEditor {
         this.target = typeof target === 'string' ? document.querySelector(target) : target;
         this.options = {
             placeholder: 'Start typing...',
+            enableAutoSave: true,
+            autoSaveKey: null, // Custom key for local storage
             ...options
         };
 
@@ -39,6 +46,7 @@ export default class RichTextEditor {
 
         this.toolbar = new Toolbar(this.toolbarElement, this.editorElement, {
             onImageClick: () => this.imageHandler.pickImage(),
+            onLinkClick: () => this.openLinkPicker(), // New handler
             onCustomCommand: (cmd, val, target) => this.handleCommand(cmd, val, target)
         });
 
@@ -52,6 +60,37 @@ export default class RichTextEditor {
         });
         this.imageResizer = new ImageResizer(this.editorElement);
         this.searchReplace = new SearchReplace(this.editorElement);
+        this.linkTooltip = new LinkTooltip(this.editorElement, (linkNode) => {
+            // Pick Link with prefiltered values from this node
+            const range = document.createRange();
+            range.selectNodeContents(linkNode); // Select text inside link
+            const sel = window.getSelection();
+            sel.removeAllRanges();
+            sel.addRange(range);
+
+            this.openLinkPicker();
+        });
+        this.linkPicker = new LinkPicker(this.editorElement, (url, text, openInNewTab) => {
+            this.insertLink(url, text, openInNewTab);
+        });
+
+        this.slashMenu = new SlashMenu(this.editorElement, {
+            onCustom: (action) => {
+                if (action === 'image') this.imageHandler.pickImage();
+                if (action === 'table') this.tablePicker.show();
+            }
+        });
+        this.codeHighlighter = new CodeHighlighter(this.editorElement);
+
+        if (this.options.enableAutoSave) {
+            // Use provided key or fallback to a hash of the selector/page
+            const key = this.options.autoSaveKey || window.location.pathname + (typeof this.target === 'string' ? this.target : 'rte');
+            this.autoSave = new AutoSave(this.editorElement, key);
+
+            this.editorElement.addEventListener('rte-autosave', () => {
+                this.updateStatus('Saved locally');
+            });
+        }
 
         // Initial setup
         this.editorElement.focus();
@@ -164,6 +203,11 @@ export default class RichTextEditor {
         this.wrapper.classList.toggle('rte-dark-mode');
         this.isDarkMode = this.wrapper.classList.contains('rte-dark-mode');
 
+        // Update Flash Menu Theme
+        if (this.slashMenu && this.slashMenu.menu) {
+            this.slashMenu.menu.classList.toggle('dark', this.isDarkMode);
+        }
+
         // Update Icon
         const icon = this.isDarkMode ? '☀️' : '🌙';
         this.toolbar.updateButtonIcon('toggleTheme', icon);
@@ -216,6 +260,61 @@ export default class RichTextEditor {
         html += '</tbody></table><p></p>';
         document.execCommand('insertHTML', false, html);
     }
+    openLinkPicker() {
+        const selection = window.getSelection();
+        if (selection.rangeCount > 0) {
+            this.savedRange = selection.getRangeAt(0);
+        } else {
+            this.savedRange = null;
+        }
+
+        let currentText = '';
+        let currentUrl = '';
+
+        // If selection is a link or inside a link, prefill
+        if (this.savedRange) {
+            const container = this.savedRange.commonAncestorContainer;
+            const node = container.nodeType === 3 ? container.parentNode : container;
+            const link = node.closest('a');
+
+            if (link) {
+                currentUrl = link.href;
+                currentText = link.innerText;
+                // Expand selection to whole link if we are inside it
+                const range = document.createRange();
+                range.selectNode(link);
+                this.savedRange = range;
+            } else {
+                currentText = this.savedRange.toString();
+            }
+        }
+
+        this.linkPicker.show(currentUrl, currentText);
+    }
+
+    insertLink(url, text, openInNewTab) {
+        this.editorElement.focus();
+
+        if (this.savedRange) {
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(this.savedRange);
+        }
+
+        // If text provided and different from selection, we might need to be smart.
+        // Simple case: HTML insert
+        let html = `<a href="${url}"`;
+        if (openInNewTab) html += ' target="_blank"';
+        html += `>${text || url}</a>`;
+
+        // If we were editing an existing link, this execCommand might nest them or fail.
+        // Safer: execCommand('createLink') but that doesn't supporting targets well across browsers easily without selection games.
+        // Let's stick to insertHTML which overwrites selection.
+        document.execCommand('insertHTML', false, html);
+
+        this.savedRange = null;
+    }
+
     createStructure() {
         // preserve original content if any
         const initialContent = this.target.value || this.target.innerHTML || '';
@@ -268,15 +367,47 @@ export default class RichTextEditor {
         // Simple word count: split by whitespace and filter empty
         const wordCount = text.trim().split(/\s+/).filter(w => w.length > 0).length;
 
-        this.statusBar.innerHTML = `<span>${wordCount} words</span><span>${charCount} chars</span>`;
+        this.statusBar.innerHTML = `<span>${wordCount} words</span><span>${charCount} chars</span> <span class="rte-status-msg" style="margin-left:auto;font-style:italic;opacity:0.7"></span>`;
+    }
+
+    updateStatus(msg) {
+        const msgEl = this.statusBar.querySelector('.rte-status-msg');
+        if (msgEl) {
+            msgEl.innerText = msg;
+            setTimeout(() => { msgEl.innerText = ''; }, 2000);
+        }
     }
 
     /**
      * Get the generated HTML
      * @returns {string} Can be saved to DB
      */
-    getHTML() {
-        return this.editorElement.innerHTML;
+    /**
+     * Get validated and minified HTML
+     * @returns {string} Minified HTML
+     */
+    getHTML(minify = false) {
+        if (!minify) return this.editorElement.innerHTML;
+
+        let html = this.editorElement.innerHTML;
+
+        // 1. Remove comments
+        html = html.replace(/<!--[\s\S]*?-->/g, "");
+
+        // 2. Protect <pre> blocks
+        const parts = html.split(/(<pre[\s\S]*?<\/pre>)/gi);
+
+        const minified = parts.map(part => {
+            if (part.toLowerCase().startsWith('<pre')) {
+                // Keep pre content as is, maybe trim edges
+                return part;
+            }
+            // Collapse all whitespace to single spaces
+            // This mimics browser rendering for non-pre whitespace
+            return part.replace(/\s+/g, ' ').replace(/>\s+</g, '><').trim();
+        }).join('');
+
+        return minified;
     }
 
     /**

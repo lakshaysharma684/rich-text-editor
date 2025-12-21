@@ -7,8 +7,12 @@ Designed for ease of use and performance, this editor provides a clean WYSIWYG e
 ## Features
 
 - **Zero Dependencies**: Pure JavaScript, lightweight and fast.
+- **Auto-Save**: Automatically saves content to LocalStorage to prevent data loss.
+- **Slash Commands**: Type `/` to access a quick menu for headings, lists, media, and more.
+- **Link Previews**: Hover over links to preview URLs, edit, or unlink.
+- **Syntax Highlighting**: Basic code block highlighting for JavaScript/HTML.
 - **Image Support**: Drag & Drop and Paste support (auto-converted to Base64).
-- **Clean Output**: Generates semantic HTML5 output.
+- **Clean Output**: Generates semantic HTML5 output with optional **minification**.
 - **Shared Styling**: Comes with a dedicated CSS file for Editor and Preview modes.
 - **Modular Architecture**: Built with ES Modules for tree-shaking and maintainability.
 
@@ -43,15 +47,22 @@ import RichTextEditor from '@lakshaykumar/rich-text-editor';
 
 // Initialize with a selector or DOM element
 const editor = new RichTextEditor('#my-editor-container', {
-    placeholder: 'Start writing your masterpiece...'
+    placeholder: 'Start writing your masterpiece...',
+    enableAutoSave: true, // Enable auto-save (default: true)
+    autoSaveKey: 'my-unique-doc-id' // Optional: Custom key for local storage
 });
 ```
 
 ### 3. Get the HTML Content
 To retrieve the content (e.g., for saving to a database):
 ```javascript
+// Get formatted HTML
 const html = editor.getHTML();
-console.log(html);
+
+// Get MINIFIED HTML (removes comments and extra whitespace)
+const minified = editor.getHTML(true);
+
+console.log(minified);
 ```
 
 ## Structure

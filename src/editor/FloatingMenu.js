@@ -44,12 +44,7 @@ export default class FloatingMenu {
             return;
         }
 
-        // Check for Link
-        const link = target.closest('a');
-        if (link && this.editor.contains(link)) {
-            this.showLinkMenu(link);
-            return;
-        }
+
 
         // Check for Table Cell
         const cell = target.closest('td');
@@ -89,46 +84,7 @@ export default class FloatingMenu {
         this.show();
     }
 
-    showLinkMenu(link) {
-        this.currentTarget = link;
-        this.menu.innerHTML = '';
 
-        // Show URL
-        const urlSpan = document.createElement('span');
-        urlSpan.className = 'rte-menu-url';
-        urlSpan.textContent = link.href.length > 20 ? link.href.substring(0, 20) + '...' : link.href;
-        this.menu.appendChild(urlSpan);
-
-        // Edit Button
-        const editBtn = document.createElement('button');
-        editBtn.textContent = '✎';
-        editBtn.title = 'Edit Link';
-        editBtn.onclick = (e) => {
-            e.stopPropagation();
-            const newUrl = prompt('Edit Link URL:', link.href);
-            if (newUrl) {
-                link.href = newUrl;
-                this.hide();
-            }
-        };
-        this.menu.appendChild(editBtn);
-
-        // Unlink Button
-        const unlinkBtn = document.createElement('button');
-        unlinkBtn.textContent = '🔗⃠';
-        unlinkBtn.title = 'Remove Link';
-        unlinkBtn.onclick = (e) => {
-            e.stopPropagation();
-            // Unwrap link
-            const parent = link.parentNode;
-            while (link.firstChild) parent.insertBefore(link.firstChild, link);
-            parent.removeChild(link);
-            this.hide();
-        };
-        this.menu.appendChild(unlinkBtn);
-
-        this.show();
-    }
 
     showTableMenu(cell) {
         this.currentTarget = cell;

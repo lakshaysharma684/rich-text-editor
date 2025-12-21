@@ -1,26 +1,53 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Rich Text Editor Demo</title>
     <link rel="stylesheet" href="src/styles/rte.css">
     <style>
-        body { font-family: sans-serif; padding: 20px; background: #f1f5f9; }
-        .container { max-width: 800px; margin: 0 auto; }
-        h1 { text-align: center; color: #334155; }
-        .actions { margin-top: 20px; text-align: right; }
-        button.action-btn {
-            background: #3b82f6; color: white; border: none; padding: 10px 20px; 
-            border-radius: 6px; cursor: pointer; font-size: 16px;
+        body {
+            font-family: sans-serif;
+            padding: 20px;
+            background: #f1f5f9;
         }
-        button.action-btn:hover { background: #2563eb; }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            color: #334155;
+        }
+
+        .actions {
+            margin-top: 20px;
+            text-align: right;
+        }
+
+        button.action-btn {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        button.action-btn:hover {
+            background: #2563eb;
+        }
     </style>
 </head>
+
 <body>
     <div class="container">
         <h1>Dependency-Free Rich Text Editor</h1>
-        
+
         <!-- The element to be replaced by the editor -->
         <div id="editor-container">
             <p>Welcome to the custom <b>Rich Text Editor</b>!</p>
@@ -34,8 +61,9 @@
 
         <div class="actions">
             <button class="action-btn" id="save-btn">Get HTML Output</button>
+            <button class="action-btn" id="minify-btn" style="background:#10b981;">Get Minified</button>
         </div>
-        
+
         <div style="margin-top: 20px;">
             <h3>Output Preview (Console also logs this):</h3>
             <textarea id="output" style="width: 100%; height: 150px; font-family: monospace;" readonly></textarea>
@@ -56,8 +84,16 @@
             const html = editor.getHTML();
             console.log('Editor HTML:', html);
             document.getElementById('output').value = html;
-            alert('HTML content captured! See text area below.');
+        });
+
+        // Handle Minify
+        document.getElementById('minify-btn').addEventListener('click', () => {
+            const html = editor.getHTML(true); // Pass true for minification
+            console.log('Minified HTML:', html);
+            document.getElementById('output').value = html;
+            alert('Minified HTML captured!');
         });
     </script>
 </body>
+
 </html>

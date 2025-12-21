@@ -176,6 +176,11 @@ export default class Toolbar {
 
                 if (btn.needsValue) {
                     if (btn.command === 'createLink') {
+                        if (this.options.onLinkClick) {
+                            this.options.onLinkClick();
+                            return;
+                        }
+                        // Fallback
                         value = prompt('Enter Link URL:', 'https://');
                         if (!value) return; // Cancelled
                     }
