@@ -4,6 +4,8 @@ A lightweight, modular, and **dependency-free** Rich Text Editor built with mode
 
 Designed for ease of use and performance, this editor provides a clean WYSIWYG experience without the bloat of heavy legacy libraries.
 
+[**🔴 View Live Demo**](https://lakshaysharma684.github.io/rich-text-editor/)
+
 ## Features
 
 - **Zero Dependencies**: Pure JavaScript, lightweight and fast.
