@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Test Import</title>
+    <link rel="stylesheet" href="src/styles/rte.css">
+    <script src="dist/rich-text-editor.min.js"></script>
+</head>
+
+<body>
+    <div id="editor"></div>
+    <script>
+        new RichTextEditor('#editor', { placeholder: 'Try importing a doc...' });
+
+        // Helper to check if button exists
+        setTimeout(() => {
+            const btn = document.querySelector('button[data-command="customImport"]');
+            if (btn) {
+                console.log('Import button found');
+                document.body.classList.add('btn-found');
+            }
+        }, 500);
+    </script>
+</body>
+
+</html>

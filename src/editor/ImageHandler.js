@@ -5,9 +5,11 @@
 export default class ImageHandler {
     /**
      * @param {HTMLElement} editorElement - The contenteditable element
+     * @param {Object} options - Options { onFile: (file) => void }
      */
-    constructor(editorElement) {
+    constructor(editorElement, options = {}) {
         this.editor = editorElement;
+        this.options = options;
         this.maxImageSize = 5 * 1024 * 1024; // 5MB limit example
         this.allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
 
@@ -75,31 +77,28 @@ export default class ImageHandler {
      */
     processFiles(files) {
         Array.from(files).forEach(file => {
-            if (!this.validateFile(file)) return;
+            if (this.allowedTypes.includes(file.type)) {
 
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                this.insertImage(e.target.result);
-            };
-            reader.readAsDataURL(file);
+                if (file.size > this.maxImageSize) {
+                    console.warn(`File size ${file.size} exceeds limit of ${this.maxImageSize} bytes.`);
+                    return;
+                }
+
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    this.insertImage(e.target.result);
+                };
+                reader.readAsDataURL(file);
+
+            } else {
+                // Not a supported image, check specialized handler
+                if (this.options.onFile) {
+                    this.options.onFile(file);
+                } else {
+                    console.warn(`File type ${file.type} not supported.`);
+                }
+            }
         });
-    }
-
-    /**
-     * Validate file type and size
-     * @param {File} file 
-     * @returns {boolean}
-     */
-    validateFile(file) {
-        if (!this.allowedTypes.includes(file.type)) {
-            console.warn(`File type ${file.type} not supported.`);
-            return false;
-        }
-        if (file.size > this.maxImageSize) {
-            console.warn(`File size ${file.size} exceeds limit of ${this.maxImageSize} bytes.`);
-            return false;
-        }
-        return true;
     }
 
     /**

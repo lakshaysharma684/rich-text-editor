@@ -1,6 +1,6 @@
 {
     "name": "@lakshaykumar/rich-text-editor",
-    "version": "1.1.2",
+    "version": "1.2.0",
     "description": "A lightweight, modular, and dependency-free Rich Text Editor built with modern JavaScript.",
     "main": "src/editor/RichTextEditor.js",
     "type": "module",
@@ -12,7 +12,7 @@
     ],
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
-        "build": "npx esbuild src/editor/RichTextEditor.js --bundle --minify --format=esm --outfile=dist/rich-text-editor.esm.js && npx esbuild src/wrapper.js --bundle --minify --format=iife --outfile=dist/rich-text-editor.min.js"
+        "build": "npx esbuild src/editor/RichTextEditor.js --bundle --minify --format=esm --outfile=dist/rich-text-editor.esm.js && npx esbuild src/wrapper.js --bundle --minify --format=iife --outfile=dist/rich-text-editor.min.js && npx esbuild src/styles/rte.css --minify --outfile=dist/rte.min.css"
     },
     "keywords": [
         "rich-text-editor",
@@ -28,7 +28,12 @@
         "lightweight",
         "zero-dependency",
         "vanilla-js",
-        "frontend"
+        "frontend",
+        "markdown-export",
+        "pdf-export",
+        "document-editor",
+        "web-component",
+        "no-dependencies"
     ],
     "author": "Lakshay Kumar",
     "license": "MIT",

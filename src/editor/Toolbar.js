@@ -76,15 +76,27 @@ export default class Toolbar {
             { label: '😀', command: 'insertEmoji', title: 'Insert Emoji' },
             { label: '🖼', command: 'customImage', title: 'Insert Image' },
             { label: '▶', command: 'insertVideo', title: 'Insert Video' },
+            { label: '📂', command: 'customImport', title: 'Import Word/Docs' },
             { label: '▦', command: 'insertTable', title: 'Insert Table' },
             { label: '―', command: 'insertHorizontalRule', title: 'Horizontal Rule' },
             { type: 'separator' },
 
             // 6. Tools (Right side)
             { label: 'Tₓ', command: 'removeFormat', title: 'Clear Formatting' },
+            { type: 'separator' },
+            {
+                type: 'dropdown', label: 'Export', title: 'Export', items: [
+                    { label: 'Markdown', command: 'exportMarkdown' },
+                    { label: 'PDF', command: 'exportPDF' }
+                ]
+            },
+            { type: 'separator' },
             { label: '🔍', command: 'toggleSearch', title: 'Find & Replace' },
+            { type: 'separator' },
             { label: '🌙', command: 'toggleTheme', title: 'Toggle Dark Mode' },
+            { type: 'separator' },
             { label: '&lt;/&gt;', command: 'toggleSource', title: 'View Source' },
+            { type: 'separator' },
             { label: '⤢', command: 'toggleFullScreen', title: 'Full Screen' }
         ];
 
@@ -153,6 +165,52 @@ export default class Toolbar {
                 return;
             }
 
+            // Handle Nested Dropdowns (like Export)
+            if (btn.type === 'dropdown') {
+                const wrapper = document.createElement('div');
+                wrapper.className = 'rte-dropdown-wrapper';
+
+                const button = document.createElement('button');
+                button.className = 'rte-toolbar-btn rte-dropdown-trigger';
+                button.innerHTML = `${btn.label} <span style="font-size:10px;margin-left:4px">▼</span>`;
+                button.title = btn.title;
+
+                const menu = document.createElement('div');
+                menu.className = 'rte-dropdown-menu';
+
+                btn.items.forEach(item => {
+                    const itemDiv = document.createElement('div');
+                    itemDiv.className = 'rte-dropdown-item';
+                    itemDiv.innerText = item.label;
+                    itemDiv.onclick = () => {
+                        this.execute(item.command);
+                        menu.classList.remove('show');
+                    };
+                    menu.appendChild(itemDiv);
+                });
+
+                button.onclick = (e) => {
+                    e.stopPropagation();
+                    // Close others
+                    this.container.querySelectorAll('.rte-dropdown-menu.show').forEach(m => {
+                        if (m !== menu) m.classList.remove('show');
+                    });
+                    menu.classList.toggle('show');
+                };
+
+                // Close on click outside
+                document.addEventListener('click', (e) => {
+                    if (!wrapper.contains(e.target)) {
+                        menu.classList.remove('show');
+                    }
+                });
+
+                wrapper.appendChild(button);
+                wrapper.appendChild(menu);
+                this.container.appendChild(wrapper);
+                return;
+            }
+
             const button = document.createElement('button');
             button.type = 'button';
             button.className = 'rte-toolbar-btn';
@@ -165,7 +223,7 @@ export default class Toolbar {
                 e.preventDefault();
 
                 // Custom Handlers
-                if (['toggleFullScreen', 'insertVideo', 'insertTable', 'toggleSource', 'toggleTheme', 'insertEmoji', 'toggleSearch'].includes(btn.command)) {
+                if (['toggleFullScreen', 'insertVideo', 'insertTable', 'toggleSource', 'toggleTheme', 'insertEmoji', 'toggleSearch', 'customImport'].includes(btn.command)) {
                     if (this.options.onCustomCommand) {
                         this.options.onCustomCommand(btn.command, null, e.currentTarget);
                     }
@@ -203,9 +261,10 @@ export default class Toolbar {
     execute(command, value = null) {
         this.editor.focus();
 
-        // Intercept Custom Font Size
-        if (command === 'customFontSize') {
-            if (this.options.onCustomCommand && value) {
+        // Intercept Custom Commands (Font Size, Export, etc.)
+        if (['customFontSize', 'exportMarkdown', 'exportPDF'].includes(command)) {
+            if (this.options.onCustomCommand) {
+                // For customFontSize, value is needed. For exports, it might be null.
                 this.options.onCustomCommand(command, value);
             }
             return;

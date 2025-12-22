@@ -109,8 +109,65 @@
 .rte-toolbar-divider {
   width: 1px;
   height: 20px;
-  background-color: #cbd5e1;
-  margin: 0 4px;
+  background-color: #e2e8f0;
+  margin: 0 6px;
+}
+
+/* Dropdown Menus (Export, etc) */
+.rte-dropdown-wrapper {
+  position: relative;
+  display: inline-flex;
+}
+
+.rte-dropdown-trigger {
+  padding-right: 8px;
+  /* Extra space for arrow */
+}
+
+.rte-dropdown-menu {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  min-width: 120px;
+  z-index: 100;
+  margin-top: 4px;
+  padding: 4px 0;
+  flex-direction: column;
+}
+
+.rte-dropdown-menu.show {
+  display: flex;
+}
+
+.rte-dropdown-item {
+  padding: 8px 12px;
+  font-size: 14px;
+  color: #334155;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.rte-dropdown-item:hover {
+  background-color: #f1f5f9;
+}
+
+/* Dark Mode Dropdowns */
+.rte-wrapper.rte-dark-mode .rte-dropdown-menu {
+  background: #1e293b;
+  border-color: #334155;
+}
+
+.rte-wrapper.rte-dark-mode .rte-dropdown-item {
+  color: #e2e8f0;
+}
+
+.rte-wrapper.rte-dark-mode .rte-dropdown-item:hover {
+  background-color: #334155;
 }
 
 /* 
@@ -876,4 +933,96 @@
   justify-content: center;
   align-items: center;
   z-index: 10003;
+}
+
+/* 
+ * Table Styles (Default formatting for tables in the editor)
+ */
+.rte-content table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1em 0;
+  table-layout: fixed;
+  /* Optional: helps with resizing stability */
+}
+
+.rte-content th,
+.rte-content td {
+  border: 1px solid #cbd5e1;
+  padding: 8px;
+  min-width: 30px;
+  vertical-align: top;
+  word-break: break-word;
+  /* Prevent overflow */
+}
+
+.rte-content th {
+  background-color: #f1f5f9;
+  font-weight: 600;
+  text-align: left;
+}
+
+/* Dark Mode Tables */
+.rte-wrapper.rte-dark-mode .rte-content th,
+.rte-wrapper.rte-dark-mode .rte-content td {
+  border-color: #334155;
+}
+
+.rte-wrapper.rte-dark-mode .rte-content th {
+  background-color: #1e293b;
+  color: #e2e8f0;
+}
+
+/*
+ * Image Resizer UI
+ */
+.rte-resizer-box {
+  position: absolute;
+  border: 2px solid var(--rte-primary-color);
+  pointer-events: none;
+  /* Let clicks pass through unless on handles */
+  z-index: 50;
+  display: none;
+  /* Hidden by default */
+  box-sizing: border-box;
+}
+
+.rte-resizer-handle {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  background: var(--rte-primary-color);
+  border: 1px solid white;
+  pointer-events: auto;
+  /* Catch clicks */
+  z-index: 51;
+}
+
+.rte-handle-nw {
+  top: -6px;
+  left: -6px;
+  cursor: nw-resize;
+}
+
+.rte-handle-ne {
+  top: -6px;
+  right: -6px;
+  cursor: ne-resize;
+}
+
+.rte-handle-sw {
+  bottom: -6px;
+  left: -6px;
+  cursor: sw-resize;
+}
+
+.rte-handle-se {
+  bottom: -6px;
+  right: -6px;
+  cursor: se-resize;
+}
+
+/* Dark Mode Resizer */
+.rte-wrapper.rte-dark-mode .rte-resizer-handle {
+  border-color: #0f172a;
 }

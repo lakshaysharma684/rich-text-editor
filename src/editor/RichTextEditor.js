@@ -12,6 +12,10 @@ import LinkTooltip from './LinkTooltip.js';
 import SlashMenu from './SlashMenu.js';
 import CodeHighlighter from './CodeHighlighter.js';
 import LinkPicker from './LinkPicker.js';
+import FileImporter from './FileImporter.js';
+
+
+import Exporter from './Exporter.js';
 
 
 export default class RichTextEditor {
@@ -40,7 +44,16 @@ export default class RichTextEditor {
         this.createStructure();
 
         // Initialize modules
-        this.imageHandler = new ImageHandler(this.editorElement);
+        this.fileImporter = new FileImporter(this.editorElement); // Init first so we can use it
+        this.exporter = new Exporter(this.editorElement);
+
+        this.imageHandler = new ImageHandler(this.editorElement, {
+            onFile: (file) => {
+                if (file.name.endsWith('.docx')) {
+                    this.fileImporter.processFile(file);
+                }
+            }
+        });
 
 
 
@@ -81,6 +94,7 @@ export default class RichTextEditor {
             }
         });
         this.codeHighlighter = new CodeHighlighter(this.editorElement);
+        // this.fileImporter moved to top
 
         if (this.options.enableAutoSave) {
             // Use provided key or fallback to a hash of the selector/page
@@ -136,6 +150,21 @@ export default class RichTextEditor {
 
         if (command === 'insertTable') {
             this.tablePicker.show();
+            return;
+        }
+
+        if (command === 'customImport') {
+            this.fileImporter.importRequest();
+            return;
+        }
+
+        if (command === 'exportMarkdown') {
+            this.exporter.exportMarkdown();
+            return;
+        }
+
+        if (command === 'exportPDF') {
+            this.exporter.exportPDF();
             return;
         }
     }

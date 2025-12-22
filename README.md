@@ -14,6 +14,7 @@ Designed for ease of use and performance, this editor provides a clean WYSIWYG e
 - **Link Previews**: Hover over links to preview URLs, edit, or unlink.
 - **Syntax Highlighting**: Basic code block highlighting for JavaScript/HTML.
 - **Image Support**: Drag & Drop and Paste support (auto-converted to Base64).
+- **Export Options**: Built-in support to export content as **Markdown** or **PDF**.
 - **Clean Output**: Generates semantic HTML5 output with optional **minification**.
 - **Shared Styling**: Comes with a dedicated CSS file for Editor and Preview modes.
 - **Modular Architecture**: Built with ES Modules for tree-shaking and maintainability.

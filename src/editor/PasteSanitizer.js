@@ -50,12 +50,17 @@ export default class PasteSanitizer {
                 }
             });
 
-            // Clean 'style' - remove mso garbage (Word)
+            // Clean 'style' - remove mso garbage (Word) but keep others
             if (el.hasAttribute('style')) {
                 let style = el.getAttribute('style');
-                // Simple check to kill Word styles
-                if (style.includes('mso-')) {
-                    el.removeAttribute('style'); // Brutal, but effective for enterprise hygiene
+                // Use regex to remove mso-* properties
+                // Matches "mso-something: value;" or "mso-something: value"
+                let cleanStyle = style.replace(/mso-[^;]+;?/g, '').trim();
+
+                if (cleanStyle) {
+                    el.setAttribute('style', cleanStyle);
+                } else {
+                    el.removeAttribute('style');
                 }
             }
 
