@@ -18,55 +18,125 @@ Designed for ease of use and performance, this editor provides a clean WYSIWYG e
 - **Shared Styling**: Comes with a dedicated CSS file for Editor and Preview modes.
 - **Modular Architecture**: Built with ES Modules for tree-shaking and maintainability.
 
-## Installation
+## Installation & Usage
 
-You can install the package via npm:
+Choose the method that best fits your project.
 
-```bash
-npm install @lakshaykumar/rich-text-editor
-```
+### Method 1: NPM (Recommended for Bundlers)
+Ideal for modern projects using Webpack, Vite, Parcel, or Rollup.
 
-## Usage
+1. **Install the package:**
+   ```bash
+   npm install @lakshaykumar/rich-text-editor
+   ```
 
-### 1. Import the CSS
-Start by including the core styles. You can import them in your JS (if your bundler supports it) or include it in your HTML.
+2. **Usage in your project (e.g., React/Vue/Vanilla JS):**
+   ```javascript
+   // 1. Import the Editor Class
+   import RichTextEditor from '@lakshaykumar/rich-text-editor';
+   
+   // 2. Import the Styles
+   import '@lakshaykumar/rich-text-editor/src/styles/rte.css';
+   
+   // 3. Initialize on a container
+   const editor = new RichTextEditor('#my-editor', {
+       placeholder: 'Start writing...'
+   });
+   ```
 
-**In JavaScript/React/Vue:**
-```javascript
-import '@lakshaykumar/rich-text-editor/src/styles/rte.css';
-```
+---
 
-**In HTML:**
+### Method 2: CDN (Fastest, No Build)
+Use the editor directly in the browser via `unpkg` or `jsDelivr`.
+
+**Full HTML Example:**
 ```html
-<link rel="stylesheet" href="./node_modules/@lakshaykumar/rich-text-editor/src/styles/rte.css">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rich Text Editor - CDN Demo</title>
+    <!-- Import Styles -->
+    <link rel="stylesheet" href="https://unpkg.com/@lakshaykumar/rich-text-editor@latest/src/styles/rte.css">
+    <style>
+        body { font-family: sans-serif; padding: 20px; }
+    </style>
+</head>
+<body>
+
+    <h1>My Editor</h1>
+    <div id="editor-container"></div>
+
+    <!-- Import Library -->
+    <script src="https://unpkg.com/@lakshaykumar/rich-text-editor@latest/dist/rich-text-editor.min.js"></script>
+
+    <script>
+        // Initialize the editor
+        const editor = new RichTextEditor('#editor-container', {
+            placeholder: 'Type something amazing...'
+        });
+    </script>
+</body>
+</html>
 ```
 
-### 2. Initialize the Editor
-Import the `RichTextEditor` class and initialize it on a target element.
+---
 
+### Method 3: Direct Download (Offline / No NPM)
+Manually download the files and host them locally.
+
+1. **Download** the `dist/` folder and `src/styles/` form this repository.
+2. **Structure:**
+   ```
+   /my-project
+     /libs
+       /rich-text-editor
+         /dist
+           rich-text-editor.min.js
+         /styles
+           rte.css
+     index.html
+   ```
+3. **Usage:**
+   ```html
+   <link rel="stylesheet" href="libs/rich-text-editor/styles/rte.css">
+   <script src="libs/rich-text-editor/dist/rich-text-editor.min.js"></script>
+
+   <div id="editor"></div>
+
+   <script>
+       const editor = new RichTextEditor('#editor');
+   </script>
+   ```
+
+---
+
+## Configuration & API
+
+### Initialization Options
 ```javascript
-import RichTextEditor from '@lakshaykumar/rich-text-editor';
-
-// Initialize with a selector or DOM element
-const editor = new RichTextEditor('#my-editor-container', {
-    placeholder: 'Start writing your masterpiece...',
-    enableAutoSave: true, // Enable auto-save (default: true)
-    autoSaveKey: 'my-unique-doc-id' // Optional: Custom key for local storage
+const editor = new RichTextEditor('#target', {
+    placeholder: 'Start typing...', // Placeholder text
+    enableAutoSave: true,           // Persist data to localStorage
+    autoSaveKey: 'unique-id'        // Key for localStorage (default: URL + Selector)
 });
 ```
 
-### 3. Get the HTML Content
-To retrieve the content (e.g., for saving to a database):
+### Methods
 ```javascript
-// Get formatted HTML
+// Get HTML Content
 const html = editor.getHTML();
 
-// Get MINIFIED HTML (removes comments and extra whitespace)
+// Get Minified HTML (removes comments/whitespace)
 const minified = editor.getHTML(true);
 
-console.log(minified);
-```
+// Set HTML Content
+editor.setHTML('<p>New content...</p>');
 
+// Clear Editor
+editor.clear();
+```
 ## Structure
 ```
 rich-text-editor/
