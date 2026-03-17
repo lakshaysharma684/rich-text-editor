@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rich Text Editor Demo — v1.3.1</title>
+    <title>Rich Text Editor Demo — v1.4.1</title>
     <link rel="stylesheet" href="src/styles/rte.css">
     <style>
         body {
@@ -145,41 +145,41 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>Dependency-Free Rich Text Editor <span class="version-badge">v1.3.1</span></h1>
+            <h1>Dependency-Free Rich Text Editor <span class="version-badge">v1.4.1</span></h1>
             <p>A lightweight, modular, and dependency-free editor built with modern JavaScript.</p>
         </div>
         <!-- v1.3.1 feature highlights -->
         <div class="feature-cards">
             <div class="feature-card">
-                <span class="tag fix">Fix</span>
-                <strong>Smart Paste Sanitizer</strong>
-                Paste from Google Docs, Word, or any website — font sizes, font families, and layout-breaking styles are stripped automatically. Your design system is always preserved.
+                <span class="tag new">New</span>
+                <strong>Interactive Table Resizer</strong>
+                Hover over table cell borders to drag and resize columns in real-time. Works automatically on all tables!
             </div>
             <div class="feature-card">
                 <span class="tag new">New</span>
-                <strong>Ctrl+Shift+V — Plain Text Paste</strong>
-                Use <kbd>Ctrl+Shift+V</kbd> (or <kbd>Cmd+Shift+V</kbd> on Mac) to paste content as plain text, stripping all formatting.
+                <strong>Advanced Markdown Shortcuts</strong>
+                Type <code>**bold**</code>, <code>_italic_</code>, or <code>`code`</code> followed by a space to instantly format your text.
             </div>
             <div class="feature-card">
                 <span class="tag new">New</span>
-                <strong>onImageUpload Callback</strong>
-                Pass an <code>onImageUpload</code> async function to upload images to your server instead of embedding them as base64.
+                <strong>Custom Command System</strong>
+                Extend the editor with your own buttons and logic using the new <code>customButtons</code> and <code>registerCommand</code> API.
             </div>
             <div class="feature-card">
                 <span class="tag new">New</span>
-                <strong>AutoSave Restore Banner</strong>
-                When an unsaved draft is found, a confirmation banner appears — choose "Restore Draft" or "Discard" instead of silent overwrite.
+                <strong>Mobile Responsive Toolbar</strong>
+                The toolbar intelligently hides overflow items into a "More" dropdown on smaller screens.
             </div>
             <div class="feature-card">
-                <span class="tag fix">Fix</span>
-                <strong>setFontSize() Fixed</strong>
-                Font size is now applied via <code>span[style]</code> elements correctly, replacing legacy <code>&lt;font&gt;</code> elements.
+                <span class="tag fix">A11y</span>
+                <strong>Pro Accessibility</strong>
+                Full ARIA labels, semantic roles, and enhanced keyboard navigation (Alt+1-6 for headings, Ctrl+K for links).
             </div>
         </div>
 
         <!-- The element replaced by the editor -->
         <div id="editor-container">
-            <p>Welcome to the <b>Rich Text Editor v1.3.1</b>!</p>
+            <p>Welcome to the <b>Rich Text Editor v1.4.1</b>!</p>
             <p>Try the following new features:</p>
             <ul>
                 <li>Paste content from Google Docs or a web page — notice the formatting stays clean</li>
@@ -224,17 +224,18 @@
         const editor = new RichTextEditor('#editor-container', {
             placeholder: 'Type your awesome content here...',
             enableAutoSave: true,
-            autoSaveKey: 'demo-v130',
-
-            // Example: simulate an async image upload (uses object URL for demo)
-            // To activate real uploads, replace this with your actual fetch call.
-            // onImageUpload: async (file) => {
-            //     const form = new FormData();
-            //     form.append('image', file);
-            //     const res = await fetch('/upload', { method: 'POST', body: form });
-            //     const data = await res.json();
-            //     return data.url;
-            // }
+            autoSaveKey: 'demo-v141',
+            customButtons: [
+                {
+                    label: '🎁',
+                    title: 'Insert Product',
+                    command: 'insertProduct',
+                    action: (editor) => {
+                        const id = prompt("Product ID:");
+                        if (id) editor.handleCommand('insertHTML', `<div class="product-embed" style="padding:10px;border:1px solid #ccc;border-radius:4px;margin:5px 0;">Product ${id}</div>`);
+                    }
+                }
+            ]
         });
 
         // Get HTML

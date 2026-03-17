@@ -2,9 +2,9 @@
 
 A lightweight, modular, and **dependency-free** Rich Text Editor built with modern JavaScript (ES6+).
 
-[**🔴 View Live Demo (v1.4.0)**](https://lakshaysharma684.github.io/rich-text-editor/)
+[**🔴 View Live Demo (v1.4.1)**](https://lakshaysharma684.github.io/rich-text-editor/)
 
-## What's New in v1.4.0 🚀
+## What's New in v1.4.1 🚀
 This major update transforms the library into an extensible platform:
 - **Custom Plugin & Command System**: Add your own buttons and commands to the toolbar without modifying the core library.
 - **Interactive Table Resizer**: Professional-grade table column resizing with visual handles.

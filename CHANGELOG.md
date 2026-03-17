@@ -1,6 +1,22 @@
 # Changelog
 
-## v1.3.1 — Paste Sanitization & UX Improvements
+## v1.4.1 — Example Updates & Bug Fixes
+- **FIX:** Updated all example files (`index.html`, `demo-editor.html`, `demo-preview.html`) to reference the latest version and features.
+- **FIX:** Resolved caching issues in unit tests by implementing versioned imports.
+
+## v1.4.0 — Extensible Platform Update
+### New Features
+- **NEW: Custom Plugin & Command System**: Extensible toolbar with `customButtons` support and `registerCommand()` API.
+- **NEW: Interactive Table Resizer**: Real-time column resizing with visual handles.
+- **NEW: Advanced Markdown Shortcuts**: Support for inline patterns (`**bold**`, `_italic_`, `` `code` ``, `[link](url)`).
+- **NEW: Mobile Responsive Toolbar**: Automatic overflow menu ("...") for small screens.
+- **NEW: Pro Image Handling**: Aspect ratio locking (hold `Shift`) and alignment presets (Left, Center, Right, Full).
+- **NEW: Accessibility (A11y)**: Full ARIA labels, `role="textbox"` support, and standardized keyboard navigation.
+- **NEW: Keyboard Shortcuts**: `Ctrl+K` (Link), `Alt+1-6` (Headings), `Alt+0` (Paragraph), `Ctrl+Enter` (Exit blocks).
+
+### Improvements
+- **IMPROVEMENT:** Updated global CSS for better table wrapping and image responsiveness.
+- **IMPROVEMENT:** Enhanced unit test suite with 18+ comprehensive test cases.
 
 ### Bug Fixes
 - **CRITICAL FIX:** Paste sanitizer now strips `font-size`, `font-family`, `line-height`, `mso-*`, `-webkit-*` and other layout-breaking styles from pasted external content (Google Docs, Microsoft Word, websites). Text now inherits the host application's design system correctly.
