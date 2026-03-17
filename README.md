@@ -2,9 +2,9 @@
 
 A lightweight, modular, and **dependency-free** Rich Text Editor built with modern JavaScript (ES6+).
 
-[**🔴 View Live Demo (v1.3.0)**](https://lakshaysharma684.github.io/rich-text-editor/)
+[**🔴 View Live Demo (v1.3.1)**](https://lakshaysharma684.github.io/rich-text-editor/)
 
-## What's New in v1.3.0 🚀
+## What's New in v1.3.1 🚀
 
 - **Smart Paste Sanitizer**: Rewritten from scratch to strip font-sizes, font-families, and messy layout styles (Word/Google Docs) while preserving your design system's colors.
 - **Plain Text Paste Shortcut**: Use `Ctrl+Shift+V` (or `Cmd+Shift+V`) to instantly paste content as pure text without any formatting.

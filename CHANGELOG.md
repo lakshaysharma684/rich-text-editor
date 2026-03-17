@@ -1,4 +1,6 @@
-## v1.3.0 — Paste Sanitization & UX Improvements
+# Changelog
+
+## v1.3.1 — Paste Sanitization & UX Improvements
 
 ### Bug Fixes
 - **CRITICAL FIX:** Paste sanitizer now strips `font-size`, `font-family`, `line-height`, `mso-*`, `-webkit-*` and other layout-breaking styles from pasted external content (Google Docs, Microsoft Word, websites). Text now inherits the host application's design system correctly.
