@@ -4,13 +4,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Article Preview (Read Only)</title>
+    <title>Article Preview (Read Only) — v1.3.0</title>
     <link rel="stylesheet" href="src/styles/rte.css">
     <style>
         body {
             font-family: sans-serif;
             padding: 20px;
-            background: #fff;
+            background: #f8fafc;
         }
 
         .container {
@@ -18,51 +18,156 @@
             margin: 0 auto;
         }
 
-        h1 {
+        h1.page-title {
             text-align: center;
             color: #334155;
-            margin-bottom: 40px;
+            margin-bottom: 6px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #64748b;
+            font-size: 14px;
+            margin-bottom: 32px;
         }
 
         .article-card {
             border: 1px solid #e2e8f0;
-            border-radius: 8px;
+            border-radius: 10px;
             overflow: hidden;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.07);
+            background: #fff;
+        }
+
+        .article-meta {
+            padding: 14px 24px;
+            background: #f1f5f9;
+            border-bottom: 1px solid #e2e8f0;
+            font-size: 13px;
+            color: #64748b;
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .article-meta span {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        /* Paste sanitizer demo callout */
+        .paste-demo-note {
+            margin: 24px 0 0 0;
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            border-radius: 8px;
+            padding: 14px 18px;
+            font-size: 13px;
+            color: #1e40af;
+            line-height: 1.6;
+        }
+
+        .paste-demo-note strong { display: block; margin-bottom: 4px; font-size: 14px; }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1em 0;
+        }
+
+        th, td {
+            border: 1px solid #cbd5e1;
+            padding: 8px 12px;
+            text-align: left;
+            font-size: 13px;
+        }
+
+        th {
+            background: #f8fafc;
+            font-weight: 600;
+            color: #334155;
         }
     </style>
 </head>
 
 <body>
     <div class="container">
-        <h1>Static Content Preview</h1>
+        <h1 class="page-title">Static Content Preview</h1>
+        <p class="subtitle">This page demonstrates how editor output renders using the <code>rte-content</code> class.</p>
 
         <div class="article-card">
-            <!-- 
-                This container uses the SAME class 'rte-content' 
+            <div class="article-meta">
+                <span>📅 March 2026</span>
+                <span>✍️ Rich Text Editor v1.3.0</span>
+                <span>📖 Read-only preview</span>
+            </div>
+
+            <!--
+                This container uses the SAME class 'rte-content'
                 to ensure it looks exactly like it did in the editor.
             -->
             <div class="rte-content">
-                <h1>The Future of Web Development</h1>
-                <p>Web development is evolving rapidly. Visual editors are becoming more powerful than ever.</p>
+                <h1>What's New in v1.3.0</h1>
+                <p>This preview demonstrates content rendered exactly as it would appear from the editor. In v1.3.0, a major paste sanitization overhaul ensures content from <strong>Google Docs</strong>, <strong>Microsoft Word</strong>, and any website renders cleanly without inheriting external font sizes, font families, or layout-breaking styles.</p>
 
                 <blockquote>
-                    "Simplicity is the ultimate sophistication." - Leonardo da Vinci
+                    "Great UX means the tool gets out of the way and lets the content speak." — v1.3.0 Release Notes
                 </blockquote>
 
-                <h3>Key Features Required:</h3>
+                <h2>New Features at a Glance</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Feature</th>
+                            <th>Type</th>
+                            <th>Details</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Smart Paste Sanitizer</td>
+                            <td>🐛 Fix</td>
+                            <td>Strips font-size, font-family, mso-*, -webkit-* on paste</td>
+                        </tr>
+                        <tr>
+                            <td>Ctrl+Shift+V</td>
+                            <td>✨ New</td>
+                            <td>Paste as plain text, stripping all formatting</td>
+                        </tr>
+                        <tr>
+                            <td>onImageUpload callback</td>
+                            <td>✨ New</td>
+                            <td>Upload images to your server instead of base64</td>
+                        </tr>
+                        <tr>
+                            <td>AutoSave restore banner</td>
+                            <td>✨ New</td>
+                            <td>Confirmation UI for unsaved draft recovery</td>
+                        </tr>
+                        <tr>
+                            <td>setFontSize() fix</td>
+                            <td>🐛 Fix</td>
+                            <td>Correctly converts &lt;font&gt; to &lt;span style&gt;</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h2>Style Allowlist</h2>
+                <p>When pasting, only the following CSS properties are preserved to ensure your application's design system is respected:</p>
                 <ul>
-                    <li>Performance</li>
-                    <li>Accessibility</li>
-                    <li><strong>User Experience</strong></li>
+                    <li><strong>Text elements:</strong> <code>color</code>, <code>background-color</code>, <code>text-align</code>, <code>font-weight</code>, <code>font-style</code>, <code>text-decoration</code>, <code>vertical-align</code></li>
+                    <li><strong>Structural elements</strong> (img, table, div, figure): all of the above + <code>border</code>, <code>width</code>, <code>height</code>, <code>margin</code>, <code>padding</code>, <code>float</code>, <code>overflow</code>, <code>object-fit</code>, <code>aspect-ratio</code></li>
                 </ul>
 
-                <p>Here is an example of an image that might have been uploaded:</p>
-                <!-- Using a placeholder for demo purposes since we don't have a real base64 image here yet -->
-                <img src="https://via.placeholder.com/600x300.png?text=Preview+Image+Example" alt="Placeholder">
-
-                <p>End of article.</p>
+                <p>End of preview. Open <a href="demo-editor.html">demo-editor.html</a> to try the editor interactively.</p>
             </div>
+        </div>
+
+        <div class="paste-demo-note">
+            <strong>💡 Paste Sanitizer Demo</strong>
+            Go to <a href="demo-editor.html">demo-editor.html</a>, copy content from a Google Doc or a website, and paste it into the editor. Notice that the text inherits the editor's typography instead of the source's font sizes and fonts.
+            Use <kbd>Ctrl+Shift+V</kbd> to paste as plain text at any time.
         </div>
     </div>
 </body>

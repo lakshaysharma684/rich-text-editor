@@ -41,9 +41,9 @@ export default class AutoSave {
     save() {
         const content = this.editor.innerHTML;
         if (!content) return;
-
         try {
             localStorage.setItem(this.key, content);
+            localStorage.setItem(this.key + '_ts', Date.now().toString());
             this.showSavedIndicator();
         } catch (e) {
             console.warn('RichTextEditor: AutoSave failed to write to localStorage', e);
@@ -52,16 +52,27 @@ export default class AutoSave {
 
     restore() {
         const saved = localStorage.getItem(this.key);
-        if (saved && saved.trim().length > 0) {
-            if (saved && saved.trim().length > 0) {
-                // Restore content.
-                // Ideally we check if it's different from current, but for now we prioritize saved work.
-                if (saved !== this.editor.innerHTML) {
-                    this.editor.innerHTML = saved;
-                    console.log('RichTextEditor: Content restored from auto-save');
-                }
-            }
-        }
+        const ts = localStorage.getItem(this.key + '_ts');
+        if (!saved || !saved.trim() || saved === this.editor.innerHTML) return;
+        const ageMin = ts ? Math.round((Date.now() - parseInt(ts)) / 60000) : null;
+        const ageStr = ageMin !== null ? `${ageMin} min ago` : 'earlier';
+        const banner = document.createElement('div');
+        banner.className = 'rte-restore-banner';
+        banner.style.cssText = 'padding:10px 16px;background:#fef9c3;border:1px solid #fbbf24;border-radius:6px;margin-bottom:8px;display:flex;align-items:center;gap:12px;font-size:13px;flex-wrap:wrap;';
+        banner.innerHTML = `
+            <span>⚠️ Unsaved draft found from <strong>${ageStr}</strong>.</span>
+            <button id="rte-restore-yes" style="background:#2563eb;color:#fff;border:none;border-radius:4px;padding:4px 12px;cursor:pointer;font-size:12px;font-weight:600;">Restore Draft</button>
+            <button id="rte-restore-no" style="background:transparent;border:1px solid #9ca3af;border-radius:4px;padding:4px 12px;cursor:pointer;font-size:12px;">Discard</button>
+        `;
+        this.editor.parentNode.insertBefore(banner, this.editor);
+        banner.querySelector('#rte-restore-yes').onclick = () => {
+            this.editor.innerHTML = saved;
+            banner.remove();
+        };
+        banner.querySelector('#rte-restore-no').onclick = () => {
+            this.clear();
+            banner.remove();
+        };
     }
 
     showSavedIndicator() {
@@ -72,5 +83,6 @@ export default class AutoSave {
 
     clear() {
         localStorage.removeItem(this.key);
+        localStorage.removeItem(this.key + '_ts');
     }
 }

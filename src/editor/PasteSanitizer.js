@@ -9,64 +9,108 @@ export default class PasteSanitizer {
     }
 
     handlePaste(e) {
-        // If we have files (images), let ImageHandler deal with it (prevent check here if needed,
-        // but usually text/html check is sufficient).
-        // Note: If clipboard has BOTH files and text, we prioritize files in ImageHandler.
-        // Ideally, we should coordinate, but for now, we process text/html if present.
-
-        const html = e.clipboardData.getData('text/html');
-        const text = e.clipboardData.getData('text/plain');
-
-        if (html) {
-            e.preventDefault(); // Stop default paste
-            const cleanHtml = this.sanitize(html);
-            document.execCommand('insertHTML', false, cleanHtml);
-        } else if (text) {
-            // Allow default plain text paste, likely safe, effectively 'insertText'
-            // But let's let default handle it to respect native OS behaviors unless we want full control.
-            // Actually, standard behavior is fine for plain text.
+        const htmlData = e.clipboardData.getData('text/html');
+        if (htmlData) {
+            const hasRealMarkup = /<(p|h[1-6]|ul|ol|li|table|img|a|strong|em|b|i|u|s|blockquote|pre|br)[^>]*>/i.test(htmlData);
+            if (hasRealMarkup) {
+                e.preventDefault();
+                const sanitized = this.sanitize(htmlData);
+                document.execCommand('insertHTML', false, sanitized);
+                return;
+            }
         }
+        // Fall through: plain text paste handled natively by browser
     }
 
     sanitize(html) {
-        const parser = new DOMParser();
-        const doc = parser.parseFromString(html, 'text/html');
-        const body = doc.body;
+        const body = new DOMParser().parseFromString(html, 'text/html').body;
 
-        // 1. Remove dangerous tags
-        const bannedTags = ['script', 'iframe', 'object', 'embed', 'form', 'input', 'button'];
-        bannedTags.forEach(tag => {
-            const elements = body.querySelectorAll(tag);
-            elements.forEach(el => el.remove());
+        // Remove dangerous tags
+        ['script', 'iframe', 'object', 'embed', 'form', 'input', 'button'].forEach(tag => {
+            body.querySelectorAll(tag).forEach(el => el.remove());
         });
 
-        // 2. Clear dangerous attributes logic
-        const allElements = body.querySelectorAll('*');
-        allElements.forEach(el => {
-            // Remove all on* events
+        // Remove Word/Office namespace tags like <o:p>, <w:sdt>
+        try {
+            body.querySelectorAll('o\\:p, w\\:sdt, m\\:oMath').forEach(el => el.remove());
+        } catch (e) {}
+
+        // Normalize <font> tags to <span>, preserving only color
+        body.querySelectorAll('font').forEach(el => {
+            const span = document.createElement('span');
+            const color = el.getAttribute('color');
+            if (color) span.style.color = color;
+            span.innerHTML = el.innerHTML;
+            el.parentNode.replaceChild(span, el);
+        });
+
+        const STRUCTURAL_TAGS = new Set([
+            'img', 'table', 'td', 'th', 'thead', 'tbody', 'tfoot', 'tr',
+            'col', 'colgroup', 'iframe', 'video', 'figure', 'figcaption', 'div'
+        ]);
+
+        const TEXT_ALLOWED = new Set([
+            'color', 'background-color', 'text-align', 'font-weight',
+            'font-style', 'text-decoration', 'text-decoration-line', 'vertical-align'
+        ]);
+
+        const STRUCTURAL_ALLOWED = new Set([
+            ...TEXT_ALLOWED,
+            'border', 'border-collapse', 'border-spacing', 'border-radius',
+            'width', 'height', 'max-width', 'min-width', 'max-height',
+            'float', 'display', 'margin', 'padding',
+            'position', 'top', 'left', 'right', 'bottom',
+            'overflow', 'object-fit', 'aspect-ratio'
+        ]);
+
+        body.querySelectorAll('*').forEach(el => {
+            // Remove event handlers
             Array.from(el.attributes).forEach(attr => {
-                if (attr.name.startsWith('on')) {
-                    el.removeAttribute(attr.name);
-                }
+                if (attr.name.startsWith('on')) el.removeAttribute(attr.name);
             });
 
-            // Clean 'style' - remove mso garbage (Word) but keep others
+            // Remove class, id, data-* attributes
+            el.removeAttribute('class');
+            el.removeAttribute('id');
+            Array.from(el.attributes)
+                .filter(a => a.name.startsWith('data-'))
+                .forEach(a => el.removeAttribute(a.name));
+
             if (el.hasAttribute('style')) {
-                let style = el.getAttribute('style');
-                // Use regex to remove mso-* properties
-                // Matches "mso-something: value;" or "mso-something: value"
-                let cleanStyle = style.replace(/mso-[^;]+;?/g, '').trim();
+                const tag = el.tagName.toLowerCase();
+                const isStructural = STRUCTURAL_TAGS.has(tag);
+                const allowedSet = isStructural ? STRUCTURAL_ALLOWED : TEXT_ALLOWED;
 
-                if (cleanStyle) {
-                    el.setAttribute('style', cleanStyle);
-                } else {
-                    el.removeAttribute('style');
-                }
+                const rawStyle = el.getAttribute('style')
+                    .replace(/mso-[^;]+;?/gi, '')
+                    .replace(/font-size\s*:[^;]+;?/gi, '')
+                    .replace(/font-family\s*:[^;]+;?/gi, '')
+                    .replace(/line-height\s*:[^;]+;?/gi, '')
+                    .replace(/-webkit-[^;]+;?/gi, '')
+                    .replace(/-apple-[^;]+;?/gi, '');
+
+                const kept = rawStyle
+                    .split(';')
+                    .map(d => d.trim())
+                    .filter(d => {
+                        if (!d) return false;
+                        const prop = d.split(':')[0].trim().toLowerCase();
+                        return [...allowedSet].some(a => prop === a || prop.startsWith(a + '-'));
+                    });
+
+                kept.length > 0
+                    ? el.setAttribute('style', kept.join('; '))
+                    : el.removeAttribute('style');
             }
+        });
 
-            // Remove classes (usually we want our own styles, not source styles)
-            if (el.hasAttribute('class')) {
-                el.removeAttribute('class');
+        // Unwrap empty <span> tags that have no remaining attributes
+        Array.from(body.querySelectorAll('span')).reverse().forEach(span => {
+            if (!span.hasAttributes()) {
+                const parent = span.parentNode;
+                if (!parent) return;
+                while (span.firstChild) parent.insertBefore(span.firstChild, span);
+                parent.removeChild(span);
             }
         });
 

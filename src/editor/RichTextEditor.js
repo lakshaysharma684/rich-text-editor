@@ -108,6 +108,16 @@ export default class RichTextEditor {
 
         // Initial setup
         this.editorElement.focus();
+
+        // Ctrl+Shift+V = Paste as plain text (strip all formatting)
+        this.editorElement.addEventListener('keydown', (e) => {
+            if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'v') {
+                e.preventDefault();
+                navigator.clipboard.readText()
+                    .then(text => document.execCommand('insertText', false, text))
+                    .catch(() => {});
+            }
+        });
     }
 
     handleCommand(command, value, target) {
@@ -204,28 +214,25 @@ export default class RichTextEditor {
     }
 
     setFontSize(size) {
-        // 1. Create a marker using the largest standard font size (7)
-        // We use styleWithCSS to try to get a span, but browsers vary.
+        if (!size) return;
+        const sel = window.getSelection();
+        if (!sel || !sel.rangeCount) return;
         document.execCommand('styleWithCSS', false, true);
         document.execCommand('fontSize', false, '7');
         document.execCommand('styleWithCSS', false, false);
-
-        // 2. Find elements with this specific marker
-        // Chrome/Edge use style="font-size: -webkit-xxx-large;" or similar
-        // Firefox/others might use <font size="7">
-        const markers = this.editorElement.querySelectorAll('span[style*="font-size: -webkit-xxx-large"], span[style*="font-size: xxx-large"], font[size="7"]');
-
-        markers.forEach(el => {
-            // 3. Apply the custom pixel size
-            el.style.fontSize = size;
-
-            // 4. Cleanup markers
-            el.removeAttribute('size');
-            // Check if style is now empty (if it was just font-size)
-            if (el.getAttribute('style') === 'font-size: ' + size + ';') {
-                // keep it
-            }
-        });
+        this.editorElement
+            .querySelectorAll('font[size="7"], span[style*="xxx-large"], span[style*="-webkit-xxx-large"]')
+            .forEach(el => {
+                if (el.tagName === 'FONT') {
+                    const span = document.createElement('span');
+                    span.style.fontSize = size;
+                    span.innerHTML = el.innerHTML;
+                    el.parentNode.replaceChild(span, el);
+                } else {
+                    el.style.fontSize = size;
+                }
+            });
+        this.editorElement.dispatchEvent(new Event('input', { bubbles: true }));
     }
 
     toggleTheme() {

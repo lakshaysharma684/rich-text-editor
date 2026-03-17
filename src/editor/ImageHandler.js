@@ -5,7 +5,7 @@
 export default class ImageHandler {
     /**
      * @param {HTMLElement} editorElement - The contenteditable element
-     * @param {Object} options - Options { onFile: (file) => void }
+     * @param {Object} options - Options { onFile: (file) => void, onImageUpload: async (file) => string }
      */
     constructor(editorElement, options = {}) {
         this.editor = editorElement;
@@ -77,33 +77,29 @@ export default class ImageHandler {
      */
     processFiles(files) {
         Array.from(files).forEach(file => {
-            if (this.allowedTypes.includes(file.type)) {
-
-                if (file.size > this.maxImageSize) {
-                    console.warn(`File size ${file.size} exceeds limit of ${this.maxImageSize} bytes.`);
-                    return;
-                }
-
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    this.insertImage(e.target.result);
-                };
-                reader.readAsDataURL(file);
-
+            if (!this.allowedTypes.includes(file.type)) {
+                this.options.onFile ? this.options.onFile(file) : console.warn(`File type ${file.type} not supported.`);
+                return;
+            }
+            if (file.size > this.maxImageSize) {
+                console.warn(`File size ${file.size} exceeds limit of ${this.maxImageSize} bytes.`);
+                return;
+            }
+            if (this.options.onImageUpload) {
+                this.options.onImageUpload(file)
+                    .then(url => { if (url) this.insertImage(url); })
+                    .catch(err => console.error('Image upload failed:', err));
             } else {
-                // Not a supported image, check specialized handler
-                if (this.options.onFile) {
-                    this.options.onFile(file);
-                } else {
-                    console.warn(`File type ${file.type} not supported.`);
-                }
+                const reader = new FileReader();
+                reader.onload = (ev) => this.insertImage(ev.target.result);
+                reader.readAsDataURL(file);
             }
         });
     }
 
     /**
-     * Insert the Base64 image at the current cursor position
-     * @param {string} src - Base64 data URL
+     * Insert the image URL/Base64 at the current cursor position
+     * @param {string} src - URL or Base64 data URL
      */
     insertImage(src) {
         // Focus the editor to ensure we have a selection

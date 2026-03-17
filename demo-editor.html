@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rich Text Editor Demo</title>
+    <title>Rich Text Editor Demo — v1.3.0</title>
     <link rel="stylesheet" href="src/styles/rte.css">
     <style>
         body {
@@ -14,32 +14,130 @@
         }
 
         .container {
-            max-width: 800px;
+            max-width: 860px;
             margin: 0 auto;
         }
 
         h1 {
             text-align: center;
             color: #334155;
+            margin-bottom: 4px;
         }
+
+        .version-badge {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .version-badge span {
+            display: inline-block;
+            background: #2563eb;
+            color: #fff;
+            font-size: 12px;
+            font-weight: 700;
+            padding: 3px 10px;
+            border-radius: 99px;
+            letter-spacing: 0.5px;
+        }
+
+        .feature-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .feature-card {
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 14px 16px;
+            font-size: 13px;
+            color: #475569;
+            line-height: 1.5;
+        }
+
+        .feature-card strong {
+            display: block;
+            font-size: 13px;
+            color: #1e293b;
+            margin-bottom: 4px;
+        }
+
+        .feature-card .tag {
+            display: inline-block;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 1px 6px;
+            border-radius: 4px;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .tag.new  { background: #dcfce7; color: #16a34a; }
+        .tag.fix  { background: #fef9c3; color: #ca8a04; }
 
         .actions {
             margin-top: 20px;
-            text-align: right;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: flex-end;
         }
 
         button.action-btn {
             background: #3b82f6;
             color: white;
             border: none;
-            padding: 10px 20px;
+            padding: 9px 18px;
             border-radius: 6px;
             cursor: pointer;
-            font-size: 16px;
+            font-size: 14px;
+            font-weight: 600;
+            transition: background 0.15s;
         }
 
-        button.action-btn:hover {
-            background: #2563eb;
+        button.action-btn:hover { background: #2563eb; }
+        button.action-btn.green { background: #10b981; }
+        button.action-btn.green:hover { background: #059669; }
+        button.action-btn.purple { background: #7c3aed; }
+        button.action-btn.purple:hover { background: #6d28d9; }
+
+        .output-section { margin-top: 20px; }
+        .output-section h3 { margin-bottom: 6px; color: #334155; font-size: 14px; }
+        textarea#output {
+            width: 100%;
+            height: 140px;
+            font-family: monospace;
+            font-size: 12px;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            padding: 8px;
+            box-sizing: border-box;
+            resize: vertical;
+        }
+
+        .upload-demo {
+            background: #fff;
+            border: 1px dashed #cbd5e1;
+            border-radius: 8px;
+            padding: 14px 16px;
+            margin-top: 16px;
+            font-size: 13px;
+            color: #64748b;
+        }
+
+        .upload-demo code {
+            display: block;
+            background: #f8fafc;
+            border-radius: 4px;
+            padding: 8px 10px;
+            font-family: monospace;
+            font-size: 12px;
+            margin-top: 8px;
+            color: #334155;
+            white-space: pre;
         }
     </style>
 </head>
@@ -47,26 +145,73 @@
 <body>
     <div class="container">
         <h1>Dependency-Free Rich Text Editor</h1>
+        <div class="version-badge"><span>v1.3.0</span></div>
 
-        <!-- The element to be replaced by the editor -->
+        <!-- v1.3.0 feature highlights -->
+        <div class="feature-cards">
+            <div class="feature-card">
+                <span class="tag fix">Fix</span>
+                <strong>Smart Paste Sanitizer</strong>
+                Paste from Google Docs, Word, or any website — font sizes, font families, and layout-breaking styles are stripped automatically. Your design system is always preserved.
+            </div>
+            <div class="feature-card">
+                <span class="tag new">New</span>
+                <strong>Ctrl+Shift+V — Plain Text Paste</strong>
+                Use <kbd>Ctrl+Shift+V</kbd> (or <kbd>Cmd+Shift+V</kbd> on Mac) to paste content as plain text, stripping all formatting.
+            </div>
+            <div class="feature-card">
+                <span class="tag new">New</span>
+                <strong>onImageUpload Callback</strong>
+                Pass an <code>onImageUpload</code> async function to upload images to your server instead of embedding them as base64.
+            </div>
+            <div class="feature-card">
+                <span class="tag new">New</span>
+                <strong>AutoSave Restore Banner</strong>
+                When an unsaved draft is found, a confirmation banner appears — choose "Restore Draft" or "Discard" instead of silent overwrite.
+            </div>
+            <div class="feature-card">
+                <span class="tag fix">Fix</span>
+                <strong>setFontSize() Fixed</strong>
+                Font size is now applied via <code>span[style]</code> elements correctly, replacing legacy <code>&lt;font&gt;</code> elements.
+            </div>
+        </div>
+
+        <!-- The element replaced by the editor -->
         <div id="editor-container">
-            <p>Welcome to the custom <b>Rich Text Editor</b>!</p>
-            <p>Try the following:</p>
+            <p>Welcome to the <b>Rich Text Editor v1.3.0</b>!</p>
+            <p>Try the following new features:</p>
             <ul>
-                <li>Format some text (Bold, Italic)</li>
-                <li>Drag and drop an image here</li>
-                <li>Paste a screenshot from your clipboard</li>
+                <li>Paste content from Google Docs or a web page — notice the formatting stays clean</li>
+                <li>Press <strong>Ctrl+Shift+V</strong> to paste as plain text</li>
+                <li>Drag and drop an image, or paste a screenshot</li>
+                <li>Use the font-size dropdown and verify it applies correctly</li>
+                <li>Type something, wait a second, then refresh — you'll see the restore banner</li>
             </ul>
         </div>
 
         <div class="actions">
+            <button class="action-btn purple" id="clear-btn">Clear Editor</button>
+            <button class="action-btn green" id="minify-btn">Get Minified HTML</button>
             <button class="action-btn" id="save-btn">Get HTML Output</button>
-            <button class="action-btn" id="minify-btn" style="background:#10b981;">Get Minified</button>
         </div>
 
-        <div style="margin-top: 20px;">
-            <h3>Output Preview (Console also logs this):</h3>
-            <textarea id="output" style="width: 100%; height: 150px; font-family: monospace;" readonly></textarea>
+        <div class="output-section">
+            <h3>HTML Output (also logged to console):</h3>
+            <textarea id="output" readonly placeholder="Click 'Get HTML Output' to see the editor HTML here..."></textarea>
+        </div>
+
+        <!-- onImageUpload usage example -->
+        <div class="upload-demo">
+            <strong>💡 onImageUpload usage (server upload instead of base64):</strong>
+            <code>const editor = new RichTextEditor('#editor', {
+    onImageUpload: async (file) => {
+        const form = new FormData();
+        form.append('image', file);
+        const res = await fetch('/upload', { method: 'POST', body: form });
+        const { url } = await res.json();
+        return url; // inserted as &lt;img src="url"&gt;
+    }
+});</code>
         </div>
     </div>
 
@@ -76,22 +221,39 @@
 
         // Initialize Editor
         const editor = new RichTextEditor('#editor-container', {
-            placeholder: 'Type your awesome content here...'
+            placeholder: 'Type your awesome content here...',
+            enableAutoSave: true,
+            autoSaveKey: 'demo-v130',
+
+            // Example: simulate an async image upload (uses object URL for demo)
+            // To activate real uploads, replace this with your actual fetch call.
+            // onImageUpload: async (file) => {
+            //     const form = new FormData();
+            //     form.append('image', file);
+            //     const res = await fetch('/upload', { method: 'POST', body: form });
+            //     const data = await res.json();
+            //     return data.url;
+            // }
         });
 
-        // Handle Save
+        // Get HTML
         document.getElementById('save-btn').addEventListener('click', () => {
             const html = editor.getHTML();
             console.log('Editor HTML:', html);
             document.getElementById('output').value = html;
         });
 
-        // Handle Minify
+        // Get Minified HTML
         document.getElementById('minify-btn').addEventListener('click', () => {
-            const html = editor.getHTML(true); // Pass true for minification
+            const html = editor.getHTML(true);
             console.log('Minified HTML:', html);
             document.getElementById('output').value = html;
-            alert('Minified HTML captured!');
+        });
+
+        // Clear
+        document.getElementById('clear-btn').addEventListener('click', () => {
+            editor.clear();
+            document.getElementById('output').value = '';
         });
     </script>
 </body>
