@@ -1,18 +1,19 @@
-import Toolbar from './Toolbar.js';
-import ImageHandler from './ImageHandler.js';
-import FloatingMenu from './FloatingMenu.js';
-import MarkdownShortcuts from './MarkdownShortcuts.js';
-import PasteSanitizer from './PasteSanitizer.js';
-import EmojiPicker from './EmojiPicker.js';
-import TablePicker from './TablePicker.js';
-import ImageResizer from './ImageResizer.js';
-import SearchReplace from './SearchReplace.js';
-import AutoSave from './AutoSave.js';
-import LinkTooltip from './LinkTooltip.js';
-import SlashMenu from './SlashMenu.js';
-import CodeHighlighter from './CodeHighlighter.js';
-import LinkPicker from './LinkPicker.js';
-import FileImporter from './FileImporter.js';
+import Toolbar from './Toolbar.js?v=1.4.0';
+import ImageHandler from './ImageHandler.js?v=1.4.0';
+import FloatingMenu from './FloatingMenu.js?v=1.4.0';
+import MarkdownShortcuts from './MarkdownShortcuts.js?v=1.4.0';
+import PasteSanitizer from './PasteSanitizer.js?v=1.4.0';
+import EmojiPicker from './EmojiPicker.js?v=1.4.0';
+import TablePicker from './TablePicker.js?v=1.4.0';
+import ImageResizer from './ImageResizer.js?v=1.4.0';
+import SearchReplace from './SearchReplace.js?v=1.4.0';
+import AutoSave from './AutoSave.js?v=1.4.0';
+import LinkTooltip from './LinkTooltip.js?v=1.4.0';
+import SlashMenu from './SlashMenu.js?v=1.4.0';
+import CodeHighlighter from './CodeHighlighter.js?v=1.4.0';
+import LinkPicker from './LinkPicker.js?v=1.4.0';
+import FileImporter from './FileImporter.js?v=1.4.0';
+import TableResizer from './TableResizer.js?v=1.4.0';
 
 
 import Exporter from './Exporter.js';
@@ -29,8 +30,11 @@ export default class RichTextEditor {
             placeholder: 'Start typing...',
             enableAutoSave: true,
             autoSaveKey: null, // Custom key for local storage
+            customButtons: [], // New in v1.4.0
             ...options
         };
+
+        this.customCommands = {}; // Store custom command callbacks
 
         if (!this.target) {
             throw new Error('RichTextEditor: Target element not found');
@@ -60,7 +64,8 @@ export default class RichTextEditor {
         this.toolbar = new Toolbar(this.toolbarElement, this.editorElement, {
             onImageClick: () => this.imageHandler.pickImage(),
             onLinkClick: () => this.openLinkPicker(), // New handler
-            onCustomCommand: (cmd, val, target) => this.handleCommand(cmd, val, target)
+            onCustomCommand: (cmd, val, target) => this.handleCommand(cmd, val, target),
+            customButtons: this.options.customButtons // Pass to toolbar
         });
 
         this.floatingMenu = new FloatingMenu(this.editorElement);
@@ -72,6 +77,7 @@ export default class RichTextEditor {
             this.insertTable(rows, cols, hasHeader);
         });
         this.imageResizer = new ImageResizer(this.editorElement);
+        this.tableResizer = new TableResizer(this.editorElement);
         this.searchReplace = new SearchReplace(this.editorElement);
         this.linkTooltip = new LinkTooltip(this.editorElement, (linkNode) => {
             // Pick Link with prefiltered values from this node
@@ -109,18 +115,70 @@ export default class RichTextEditor {
         // Initial setup
         this.editorElement.focus();
 
-        // Ctrl+Shift+V = Paste as plain text (strip all formatting)
+        // Keyboard Shortcuts (v1.4.0)
         this.editorElement.addEventListener('keydown', (e) => {
+            // Ctrl+Shift+V = Paste as plain text (existing)
             if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'v') {
                 e.preventDefault();
                 navigator.clipboard.readText()
                     .then(text => document.execCommand('insertText', false, text))
                     .catch(() => {});
+                return;
+            }
+
+            // Ctrl+K / Cmd+K = Open Link Picker
+            if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+                e.preventDefault();
+                this.openLinkPicker();
+                return;
+            }
+
+            // Alt+1 to Alt+6 = H1 to H6
+            if (e.altKey && e.key >= '1' && e.key <= '6') {
+                e.preventDefault();
+                this.handleCommand('formatBlock', `H${e.key}`);
+                return;
+            }
+
+            // Alt+0 = Paragraph
+            if (e.altKey && e.key === '0') {
+                e.preventDefault();
+                this.handleCommand('formatBlock', 'P');
+                return;
+            }
+
+            // Ctrl+Enter = Exit Blockquote/List
+            if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                const selection = window.getSelection();
+                const range = selection.getRangeAt(0);
+                const container = range.commonAncestorContainer;
+                const block = (container.nodeType === 3 ? container.parentNode : container).closest('blockquote, ul, ol');
+                
+                if (block) {
+                    e.preventDefault();
+                    // Insert a paragraph after the block
+                    const p = document.createElement('p');
+                    p.innerHTML = '<br>';
+                    block.parentNode.insertBefore(p, block.nextSibling);
+                    
+                    // Move cursor to new paragraph
+                    const newRange = document.createRange();
+                    newRange.setStart(p, 0);
+                    newRange.collapse(true);
+                    selection.removeAllRanges();
+                    selection.addRange(newRange);
+                }
             }
         });
     }
 
     handleCommand(command, value, target) {
+        // Check for Custom Registered Commands first (v1.4.0)
+        if (this.customCommands[command]) {
+            this.customCommands[command](this, value, target);
+            return;
+        }
+
         if (command === 'toggleFullScreen') {
             this.wrapper.classList.toggle('rte-fullscreen');
             return;
@@ -367,6 +425,8 @@ export default class RichTextEditor {
         this.editorElement = document.createElement('div');
         this.editorElement.className = 'rte-content';
         this.editorElement.contentEditable = true;
+        this.editorElement.setAttribute('role', 'textbox');
+        this.editorElement.setAttribute('aria-multiline', 'true');
         this.editorElement.setAttribute('data-placeholder', this.options.placeholder);
         this.editorElement.innerHTML = initialContent;
 
@@ -459,5 +519,14 @@ export default class RichTextEditor {
      */
     clear() {
         this.editorElement.innerHTML = '';
+    }
+
+    /**
+     * Register a custom command (v1.4.0)
+     * @param {string} name 
+     * @param {function} callback 
+     */
+    registerCommand(name, callback) {
+        this.customCommands[name] = callback;
     }
 }

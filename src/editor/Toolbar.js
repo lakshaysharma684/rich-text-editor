@@ -100,11 +100,28 @@ export default class Toolbar {
             { label: '⤢', command: 'toggleFullScreen', title: 'Full Screen' }
         ];
 
+        // Merge custom buttons (v1.4.0)
+        if (this.options.customButtons && Array.isArray(this.options.customButtons)) {
+            if (this.options.customButtons.length > 0) {
+                this.buttons.push({ type: 'separator' });
+                this.options.customButtons.forEach(btn => {
+                    this.buttons.push({
+                        ...btn,
+                        isCustom: true
+                    });
+                });
+            }
+        }
+
         this.init();
+
+        window.addEventListener('resize', () => this.checkOverflow());
     }
 
     init() {
         this.render();
+        // Wait for next frame to ensure elements are in DOM
+        requestAnimationFrame(() => this.checkOverflow());
         this.bindEvents();
     }
 
@@ -125,7 +142,8 @@ export default class Toolbar {
                 wrapper.className = 'rte-select-wrapper';
 
                 const select = document.createElement('select');
-                select.title = btn.title;
+                select.title = btn.title || '';
+                select.setAttribute('aria-label', btn.title || btn.label || 'Select option');
                 select.className = 'rte-toolbar-select';
 
                 btn.options.forEach(opt => {
@@ -150,7 +168,8 @@ export default class Toolbar {
             if (btn.type === 'color') {
                 const wrapper = document.createElement('div');
                 wrapper.className = 'rte-color-picker';
-                wrapper.title = btn.title;
+                wrapper.title = btn.title || '';
+                wrapper.setAttribute('aria-label', btn.title || 'Pick color');
 
                 const label = document.createElement('span');
                 label.innerHTML = btn.label;
@@ -173,7 +192,8 @@ export default class Toolbar {
                 const button = document.createElement('button');
                 button.className = 'rte-toolbar-btn rte-dropdown-trigger';
                 button.innerHTML = `${btn.label} <span style="font-size:10px;margin-left:4px">▼</span>`;
-                button.title = btn.title;
+                button.title = btn.title || '';
+                button.setAttribute('aria-label', btn.title || btn.label);
 
                 const menu = document.createElement('div');
                 menu.className = 'rte-dropdown-menu';
@@ -216,6 +236,7 @@ export default class Toolbar {
             button.className = 'rte-toolbar-btn';
             button.innerHTML = btn.label;
             button.title = btn.title || '';
+            button.setAttribute('aria-label', btn.title || btn.label);
             button.dataset.command = btn.command;
             if (btn.value) button.dataset.value = btn.value;
 
@@ -253,6 +274,16 @@ export default class Toolbar {
 
                 this.execute(btn.command, value);
             });
+
+            // Handle Action for Custom Buttons (v1.4.0)
+            if (btn.isCustom && btn.action) {
+                button.addEventListener('click', (e) => {
+                    // Note: execute() already focused the editor, but we might want to pass control
+                    btn.action(this.options.editorInstance || null); 
+                    // Wait, Toolbar doesn't have editorInstance easily. 
+                    // Let's rely on handleCommand in RichTextEditor instead.
+                });
+            }
 
             this.container.appendChild(button);
         });
@@ -369,6 +400,80 @@ export default class Toolbar {
         const btn = this.container.querySelector(`button[data-command="${command}"]`);
         if (btn) {
             btn.innerHTML = icon;
+        }
+    }
+
+    checkOverflow() {
+        if (!this.container) return;
+
+        // Reset visibility
+        const elements = Array.from(this.container.children);
+        elements.forEach(el => {
+            if (!el.classList.contains('rte-more-wrapper')) {
+                el.style.display = '';
+            }
+        });
+
+        // Remove existing more button if any
+        const existingMore = this.container.querySelector('.rte-more-wrapper');
+        if (existingMore) existingMore.remove();
+
+        const containerWidth = this.container.offsetWidth;
+        let currentWidth = 0;
+        const overflowItems = [];
+        const gap = 4; // Gap between buttons
+
+        elements.forEach((el, index) => {
+            currentWidth += el.offsetWidth + gap;
+            
+            // If we're getting close to the end, start hiding
+            // Leave space for the 'More' button (approx 40px)
+            if (currentWidth > containerWidth - 45) {
+                overflowItems.push(el);
+            }
+        });
+
+        if (overflowItems.length > 0) {
+            // Create More Button
+            const moreWrapper = document.createElement('div');
+            moreWrapper.className = 'rte-dropdown-wrapper rte-more-wrapper';
+            
+            const moreBtn = document.createElement('button');
+            moreBtn.className = 'rte-toolbar-btn';
+            moreBtn.innerHTML = '...';
+            moreBtn.title = 'More';
+            moreBtn.setAttribute('aria-label', 'More options');
+
+            const moreMenu = document.createElement('div');
+            moreMenu.className = 'rte-dropdown-menu rte-more-menu';
+
+            overflowItems.forEach(item => {
+                // If it's a button, clone its logic into a menu item
+                const clone = document.createElement('div');
+                clone.className = 'rte-dropdown-item';
+                
+                if (item.classList.contains('rte-toolbar-divider')) {
+                    clone.className = 'rte-dropdown-divider';
+                } else if (item.querySelector('select')) {
+                    clone.innerText = item.querySelector('select').title || 'Option';
+                } else {
+                    clone.innerHTML = item.innerHTML;
+                    clone.title = item.title;
+                    clone.onclick = () => item.click();
+                }
+                
+                moreMenu.appendChild(clone);
+                item.style.display = 'none';
+            });
+
+            moreBtn.onclick = (e) => {
+                e.stopPropagation();
+                moreMenu.classList.toggle('show');
+            };
+
+            moreWrapper.appendChild(moreBtn);
+            moreWrapper.appendChild(moreMenu);
+            this.container.appendChild(moreWrapper);
         }
     }
 }

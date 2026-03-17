@@ -9,8 +9,8 @@ export default class MarkdownShortcuts {
     }
 
     handleInput(e) {
-        // Only trigger on Space (32)
-        if (e.keyCode !== 32) return;
+        // Trigger on Space (32) or Enter (13)
+        if (e.keyCode !== 32 && e.keyCode !== 13) return;
 
         const selection = window.getSelection();
         if (!selection.isCollapsed) return;
@@ -22,53 +22,73 @@ export default class MarkdownShortcuts {
         if (node.nodeType !== 3) return;
 
         const text = node.textContent;
-        // Get text up to caret
         const offset = range.startOffset;
         const textBefore = text.slice(0, offset);
 
-        // Regex for patterns
-        const patterns = [
-            { // # H1
-                regex: /^# $/,
-                command: 'formatBlock', value: 'H1'
+        // 1. Block Patterns (existing)
+        const blockPatterns = [
+            { regex: /^# $/, command: 'formatBlock', value: 'H1' },
+            { regex: /^## $/, command: 'formatBlock', value: 'H2' },
+            { regex: /^> $/, command: 'formatBlock', value: 'BLOCKQUOTE' },
+            { regex: /^[\*-] $/, command: 'insertUnorderedList', value: null },
+            { regex: /^1\. $/, command: 'insertOrderedList', value: null },
+            { regex: /^``` $/, command: 'formatBlock', value: 'PRE' },
+            { regex: /^--- $/, command: 'insertHorizontalRule', value: null }
+        ];
+
+        for (const p of blockPatterns) {
+            if (p.regex.test(textBefore)) {
+                e.preventDefault();
+                node.textContent = text.slice(offset);
+                document.execCommand(p.command, false, p.value);
+                return;
+            }
+        }
+
+        // 2. Inline Patterns (New in v1.4.0)
+        // Patterns: **bold**, _italic_, `code`, [label](url)
+        const inlinePatterns = [
+            { // **bold**
+                regex: /\*\*(.*?)\*\* $/,
+                replace: (match, p1) => `<b>${p1}</b>&nbsp;`
             },
-            { // ## H2
-                regex: /^## $/,
-                command: 'formatBlock', value: 'H2'
+            { // _italic_
+                regex: /_(.*?)_ $/,
+                replace: (match, p1) => `<i>${p1}</i>&nbsp;`
             },
-            { // > Blockquote
-                regex: /^> $/,
-                command: 'formatBlock', value: 'BLOCKQUOTE'
+            { // `code`
+                regex: /`(.*?)` $/,
+                replace: (match, p1) => `<code style="background:#f1f5f9;padding:2px 4px;border-radius:4px;font-family:monospace">${p1}</code>&nbsp;`
             },
-            { // * or - for unordered list
-                regex: /^[\*-] $/,
-                command: 'insertUnorderedList', value: null
-            },
-            { // 1. for ordered list
-                regex: /^1\. $/,
-                command: 'insertOrderedList', value: null
-            },
-            { // ``` for code block
-                regex: /^``` $/,
-                command: 'formatBlock', value: 'PRE'
-            },
-            { // --- for Horizontal Rule
-                regex: /^--- $/,
-                command: 'insertHorizontalRule', value: null
+            { // [label](url)
+                regex: /\[(.*?)\]\((.*?)\) $/,
+                replace: (match, p1, p2) => `<a href="${p2}">${p1}</a>&nbsp;`
             }
         ];
 
-        for (const p of patterns) {
-            if (p.regex.test(textBefore)) {
-                // Matched!
+        for (const p of inlinePatterns) {
+            const match = textBefore.match(p.regex);
+            if (match) {
                 e.preventDefault();
+                
+                // Remove the markdown pattern from the text node
+                const beforeMatch = textBefore.slice(0, match.index);
+                const afterMatch = text.slice(offset);
+                
+                // If we use insertHTML, we need to handle the range carefully
+                const html = p.replace(...match);
+                
+                // Set new content
+                node.textContent = beforeMatch;
+                
+                // Move range to after the text
+                range.setStart(node, beforeMatch.length);
+                range.setEnd(node, beforeMatch.length);
+                selection.removeAllRanges();
+                selection.addRange(range);
 
-                // Remove the markdown trigger characters
-                const cleanText = text.slice(offset); // text after caret
-                node.textContent = cleanText;
-
-                // Execute the command
-                document.execCommand(p.command, false, p.value);
+                // Insert the HTML
+                document.execCommand('insertHTML', false, html);
                 return;
             }
         }

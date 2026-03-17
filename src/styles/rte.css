@@ -804,6 +804,85 @@
   color: #fff;
 }
 
+.rte-resizer-toolbar {
+    position: absolute;
+    bottom: -40px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #1e293b;
+    border-radius: 6px;
+    padding: 4px;
+    display: flex;
+    gap: 4px;
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+}
+
+.rte-resizer-toolbar button {
+    background: transparent;
+    border: none;
+    color: white;
+    padding: 4px 8px;
+    cursor: pointer;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.rte-resizer-toolbar button:hover {
+    background: #334155;
+}
+
+.rte-search-highlight {
+    background-color: #fef08a;
+    color: #854d0e;
+    padding: 0 2px;
+    border-radius: 2px;
+    box-shadow: 0 0 0 1px #eab308;
+}
+
+.rte-dropdown-divider {
+    height: 1px;
+    background: #e2e8f0;
+    margin: 4px 0;
+}
+
+.rte-more-wrapper {
+    margin-left: auto;
+}
+
+.rte-more-menu {
+    right: 0;
+}
+
+.rte-more-menu .rte-dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+}
+.rte-table-resizer-handle {
+    position: absolute;
+    width: 4px;
+    background: #3b82f6;
+    cursor: col-resize;
+    z-index: 1000;
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.rte-table-resizer-handle:hover,
+.rte-table-resizer-handle.active {
+    opacity: 1;
+}
+
+.rte-table-resizer-handle::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -2px;
+    right: -2px;
+    bottom: 0;
+}
+
 @keyframes rte-fade-in {
   from {
     opacity: 0;
@@ -939,17 +1018,6 @@
  * Table Styles (Default formatting for tables in the editor)
  */
 .rte-content table {
-  width: 100%;
-  border-collapse: collapse;
-  margin: 1em 0;
-  table-layout: fixed;
-  /* Optional: helps with resizing stability */
-}
-
-.rte-content th,
-.rte-content td {
-  border: 1px solid #cbd5e1;
-  padding: 8px;
   min-width: 30px;
   vertical-align: top;
   word-break: break-word;

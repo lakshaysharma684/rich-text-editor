@@ -22,6 +22,17 @@ export default class ImageResizer {
             this.overlay.appendChild(handle);
         });
 
+        // Create Alignment Toolbar (v1.4.0)
+        this.alignBar = document.createElement('div');
+        this.alignBar.className = 'rte-resizer-toolbar';
+        this.alignBar.innerHTML = `
+            <button data-align="full" title="Full Width">↔</button>
+            <button data-align="left" title="Float Left">⇠</button>
+            <button data-align="center" title="Center">⇿</button>
+            <button data-align="right" title="Float Right">⇢</button>
+        `;
+        this.overlay.appendChild(this.alignBar);
+
         document.body.appendChild(this.overlay);
 
         this.bindEvents();
@@ -54,6 +65,17 @@ export default class ImageResizer {
             }
         });
 
+        // Handle Alignment (v1.4.0)
+        this.alignBar.addEventListener('click', (e) => {
+            const btn = e.target.closest('button');
+            if (!btn || !this.currentImg) return;
+            e.preventDefault();
+            e.stopPropagation();
+
+            const align = btn.dataset.align;
+            this.applyAlignment(align);
+        });
+
         document.addEventListener('mousemove', (e) => {
             if (this.isResizing) this.resize(e);
         });
@@ -61,6 +83,33 @@ export default class ImageResizer {
         document.addEventListener('mouseup', () => {
             this.stopResize();
         });
+    }
+
+    applyAlignment(align) {
+        if (!this.currentImg) return;
+
+        // Reset
+        this.currentImg.style.float = '';
+        this.currentImg.style.display = 'block';
+        this.currentImg.style.margin = '1em auto';
+        this.currentImg.style.width = '';
+
+        if (align === 'full') {
+            this.currentImg.style.width = '100%';
+        } else if (align === 'left') {
+            this.currentImg.style.float = 'left';
+            this.currentImg.style.display = 'inline';
+            this.currentImg.style.margin = '0 1em 1em 0';
+        } else if (align === 'right') {
+            this.currentImg.style.float = 'right';
+            this.currentImg.style.display = 'inline';
+            this.currentImg.style.margin = '0 0 1em 1em';
+        } else if (align === 'center') {
+            // Already set by default block + margin auto
+        }
+
+        this.updateOverlayPosition();
+        this.editor.dispatchEvent(new Event('input', { bubbles: true }));
     }
 
     selectImage(img) {
@@ -92,7 +141,8 @@ export default class ImageResizer {
             w: rect.width,
             h: rect.height,
             x: e.clientX,
-            y: e.clientY
+            y: e.clientY,
+            ratio: rect.width / rect.height
         };
     }
 
@@ -102,9 +152,6 @@ export default class ImageResizer {
         let deltaX = e.clientX - this.startDim.x;
         let deltaY = e.clientY - this.startDim.y;
 
-        // Lock aspect ratio? Optional. For now free resize or shift-key could lock.
-        // Let's keep it simple: Width driven mostly.
-
         let newWidth = this.startDim.w;
         let newHeight = this.startDim.h;
 
@@ -113,6 +160,15 @@ export default class ImageResizer {
         if (this.handle.includes('w')) newWidth -= deltaX;
         if (this.handle.includes('s')) newHeight += deltaY;
         if (this.handle.includes('n')) newHeight -= deltaY;
+
+        // Aspect Ratio Locking (v1.4.0)
+        if (e.shiftKey) {
+            if (Math.abs(deltaX) > Math.abs(deltaY)) {
+                newHeight = newWidth / this.startDim.ratio;
+            } else {
+                newWidth = newHeight * this.startDim.ratio;
+            }
+        }
 
         // Min dimensions
         if (newWidth < 20) newWidth = 20;

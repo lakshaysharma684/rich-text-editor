@@ -177,16 +177,47 @@
     <div class="editor-container-outer">
         <div id="editor-target">
             <h2>Welcome to v1.3.1! 🚀</h2>
-            <p>Try the following new features directly in this demo:</p>
+    <header class="header">
+        <h1>RichTextEditor <span style="font-size: 0.5em; vertical-align: middle; background: #3b82f6; color: white; padding: 2px 8px; border-radius: 99px;">v1.4.0</span></h1>
+        <p>A lightweight, professional-grade, and extensible rich text platform.</p>
+    </header>
+
+    <main class="container">
+        <div id="editor-container">
+            <h2>Welcome to Version 1.4.0! 🚀</h2>
+            <p>This update transforms the editor into a powerful extensible platform.</p>
+            
+            <h3>New Professional Features:</h3>
             <ul>
-                <li><b>Smart Paste:</b> Paste content from Word or Google Docs — watch how it stays clean and matches our theme.</li>
-                <li><b>Plain Text Paste:</b> Press <code>Ctrl+Shift+V</code> to strip all formatting instantly.</li>
-                <li><b>Large Font Sizes:</b> Use the font-size dropdown and try the 72px option.</li>
-                <li><b>Auto-Save:</b> Type something, wait a second, then refresh the page!</li>
+                <li><b>Custom Plugin System</b>: Add your own buttons like the "Gift" icon above!</li>
+                <li><b>Table Resizing</b>: Hover over table borders and drag to resize columns.</li>
+                <li><b>Advanced Markdown</b>: Try typing <code>**bold**</code> or <code>[Google](https://google.com)</code> followed by a space.</li>
+                <li><b>Mobile Responsive</b>: Resize your browser to see the toolbar overflow into a "More" menu.</li>
             </ul>
-            <p><i>The editor is completely dependency-free and handles images/tables with ease.</i></p>
+
+            <table style="width:100%; border-collapse:collapse;">
+                <thead>
+                    <tr>
+                        <th style="border:1px solid #ccc; padding:8px;">Feature</th>
+                        <th style="border:1px solid #ccc; padding:8px;">Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="border:1px solid #ccc; padding:8px;">Plugin System</td>
+                        <td style="border:1px solid #ccc; padding:8px;">✅ Ready</td>
+                    </tr>
+                    <tr>
+                        <td style="border:1px solid #ccc; padding:8px;">Table Resizing</td>
+                        <td style="border:1px solid #ccc; padding:8px;">✅ Ready</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <p>Try the new <b>aspect ratio locking</b> by holding <code>Shift</code> while resizing the image below:</p>
+            <img src="https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=600&q=80" alt="Coding" style="width:300px; margin: 1em auto;">
         </div>
-    </div>
+    </main>
 
     <div class="features-grid">
         <div class="feature-card">
@@ -220,15 +251,33 @@
         </div>
     </footer>
 
-    <!-- Import as Module -->
     <script type="module">
         import RichTextEditor from './src/editor/RichTextEditor.js';
 
-        // Initialize Editor
-        const editor = new RichTextEditor('#editor-target', {
-            placeholder: 'Type your awesome content here...',
-            autoSaveKey: 'landing-page-demo'
+        const editor = new RichTextEditor('#editor-container', {
+            placeholder: 'Start building something great...',
+            enableAutoSave: true,
+            customButtons: [
+                {
+                    label: '🎁',
+                    title: 'Insert Product',
+                    command: 'insertProduct',
+                    action: (editor) => {
+                        const id = prompt("Product ID (try '123'):");
+                        if (id) {
+                            document.execCommand('insertHTML', false, `<div class="product-embed" style="background:#f1f5f9; padding:10px; border-radius:8px; border:1px solid #cbd5e1; margin:10px 0; display:inline-block;">🎁 Product #${id}</div>`);
+                        }
+                    }
+                }
+            ]
         });
+
+        // Register custom command
+        editor.registerCommand('insertProduct', (editor, value) => {
+            console.log('Custom command "insertProduct" triggered');
+        });
+
+        window.editor = editor;
     </script>
 </body>
 </html>
