@@ -1,99 +1,234 @@
 <!DOCTYPE html>
-<html lang="en">
-
+<html lang="en" data-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rich Text Editor Demo</title>
+    <title>Rich Text Editor — v1.3.0 Release</title>
+    <!-- Use Local Styles (GitHub Pages will find them via relative path) -->
     <link rel="stylesheet" href="src/styles/rte.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
-        body {
-            font-family: sans-serif;
-            padding: 20px;
-            background: #f1f5f9;
+        :root {
+            --primary: #6366f1;
+            --primary-hover: #4f46e5;
+            --bg: #f8fafc;
+            --text: #1e293b;
+            --card-bg: #ffffff;
+            --border: #e2e8f0;
         }
 
-        .container {
-            max-width: 800px;
+        [data-theme="dark"] {
+            --bg: #0f172a;
+            --text: #f1f5f9;
+            --card-bg: #1e293b;
+            --border: #334155;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            transition: background 0.3s, color 0.3s;
+        }
+
+        .hero {
+            text-align: center;
+            padding: 4rem 2rem 2rem;
+            max-width: 1000px;
             margin: 0 auto;
         }
 
         h1 {
-            text-align: center;
-            color: #334155;
+            font-family: 'Outfit', sans-serif;
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
+
+        .version-badge {
+            display: inline-block;
+            background: #6366f1;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 999px;
+            font-weight: 700;
+            font-size: 0.85rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+        }
+
+        .hero p {
+            font-size: 1.25rem;
+            color: #64748b;
+            max-width: 600px;
+            margin: 0 auto 2.5rem;
+        }
+
+        .editor-container-outer {
+            max-width: 900px;
+            margin: 0 auto 4rem;
+            padding: 0 1rem;
+        }
+
+        #editor-target {
+            background: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04);
+            min-height: 400px;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            max-width: 1000px;
+            margin: 0 auto 4rem;
+            padding: 0 2rem;
+        }
+
+        .feature-card {
+            background: var(--card-bg);
+            padding: 1.5rem;
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            text-align: left;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 20px rgba(0,0,0,0.05);
+        }
+
+        .feature-tag {
+            font-size: 0.7rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            padding: 2px 8px;
+            border-radius: 4px;
+            margin-bottom: 0.75rem;
+            display: inline-block;
+        }
+
+        .tag-new { background: #dcfce7; color: #166534; }
+        .tag-fix { background: #fee2e2; color: #991b1b; }
+
+        .feature-card h3 { margin: 0 0 0.5rem; font-size: 1.1rem; }
+        .feature-card p { margin: 0; color: #64748b; font-size: 0.9rem; }
 
         .actions {
-            margin-top: 20px;
-            text-align: right;
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 4rem;
         }
 
-        button.action-btn {
-            background: #3b82f6;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 6px;
+        .btn {
+            padding: 10px 24px;
+            border-radius: 8px;
+            font-weight: 600;
             cursor: pointer;
-            font-size: 16px;
+            border: none;
+            transition: all 0.2s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
         }
 
-        button.action-btn:hover {
-            background: #2563eb;
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-primary:hover { background: var(--primary-hover); transform: scale(1.02); }
+        .btn-secondary { background: #e2e8f0; color: #475569; }
+        .btn-secondary:hover { background: #cbd5e1; }
+
+        footer {
+            text-align: center;
+            padding: 4rem 2rem;
+            background: #1e293b;
+            color: #94a3b8;
+            font-size: 0.9rem;
         }
+
+        .footer-links { margin-top: 1rem; display: flex; justify-content: center; gap: 2rem; }
+        .footer-links a { color: #f1f5f9; text-decoration: none; font-weight: 500; }
     </style>
 </head>
-
 <body>
-    <div class="container">
+
+    <section class="hero">
+        <div class="version-badge">v1.3.0 Release</div>
         <h1>Dependency-Free Rich Text Editor</h1>
-
-        <!-- The element to be replaced by the editor -->
-        <div id="editor-container">
-            <p>Welcome to the custom <b>Rich Text Editor</b>!</p>
-            <p>Try the following:</p>
-            <ul>
-                <li>Format some text (Bold, Italic)</li>
-                <li>Drag and drop an image here</li>
-                <li>Paste a screenshot from your clipboard</li>
-            </ul>
-        </div>
-
+        <p>A lightweight, modular, and dependency-free editor with smart paste sanitization, auto-save, and powerful shortcuts.</p>
+        
         <div class="actions">
-            <button class="action-btn" id="save-btn">Get HTML Output</button>
-            <button class="action-btn" id="minify-btn" style="background:#10b981;">Get Minified</button>
+            <a href="https://github.com/lakshaysharma684/rich-text-editor" class="btn btn-primary">GitHub Repo</a>
+            <a href="demo-editor.html" class="btn btn-secondary">Advanced Demo</a>
         </div>
+    </section>
 
-        <div style="margin-top: 20px;">
-            <h3>Output Preview (Console also logs this):</h3>
-            <textarea id="output" style="width: 100%; height: 150px; font-family: monospace;" readonly></textarea>
+    <div class="editor-container-outer">
+        <div id="editor-target">
+            <h2>Welcome to v1.3.0! 🚀</h2>
+            <p>Try the following new features directly in this demo:</p>
+            <ul>
+                <li><b>Smart Paste:</b> Paste content from Word or Google Docs — watch how it stays clean and matches our theme.</li>
+                <li><b>Plain Text Paste:</b> Press <code>Ctrl+Shift+V</code> to strip all formatting instantly.</li>
+                <li><b>Large Font Sizes:</b> Use the font-size dropdown and try the 72px option.</li>
+                <li><b>Auto-Save:</b> Type something, wait a second, then refresh the page!</li>
+            </ul>
+            <p><i>The editor is completely dependency-free and handles images/tables with ease.</i></p>
         </div>
     </div>
+
+    <div class="features-grid">
+        <div class="feature-card">
+            <span class="feature-tag tag-new">New</span>
+            <h3>Smart Paste Sanitizer</h3>
+            <p>Aggressively cleans pasted HTML while preserving colors and basic structure. No more broken layouts from Word or Google Docs.</p>
+        </div>
+        <div class="feature-card">
+            <span class="feature-tag tag-new">New</span>
+            <h3>Plain Text Paste</h3>
+            <p>Introducing <code>Ctrl+Shift+V</code> (Cmd+Shift+V). Paste content as pure text, removing all styles in one go.</p>
+        </div>
+        <div class="feature-card">
+            <span class="feature-tag tag-fix">Fix</span>
+            <h3>AutoSave Restore Banner</h3>
+            <p>Never lose work again. A non-intrusive banner appears if an unsaved draft is found, giving you the choice to restore or discard.</p>
+        </div>
+        <div class="feature-card">
+            <span class="feature-tag tag-fix">Fix</span>
+            <h3>Reliable Font Sizes</h3>
+            <p>Rewritten font-size handling that ensures consistent pixel-based sizing across all browsers.</p>
+        </div>
+    </div>
+
+    <footer>
+        <p>Built with ❤️ by Lakshay Kumar</p>
+        <div class="footer-links">
+            <a href="https://github.com/lakshaysharma684/rich-text-editor">GitHub</a>
+            <a href="https://www.npmjs.com/package/@lakshaykumar/rich-text-editor">NPM</a>
+            <a href="demo-preview.html">Preview Demo</a>
+        </div>
+    </footer>
 
     <!-- Import as Module -->
     <script type="module">
         import RichTextEditor from './src/editor/RichTextEditor.js';
 
         // Initialize Editor
-        const editor = new RichTextEditor('#editor-container', {
-            placeholder: 'Type your awesome content here...'
-        });
-
-        // Handle Save
-        document.getElementById('save-btn').addEventListener('click', () => {
-            const html = editor.getHTML();
-            console.log('Editor HTML:', html);
-            document.getElementById('output').value = html;
-        });
-
-        // Handle Minify
-        document.getElementById('minify-btn').addEventListener('click', () => {
-            const html = editor.getHTML(true); // Pass true for minification
-            console.log('Minified HTML:', html);
-            document.getElementById('output').value = html;
-            alert('Minified HTML captured!');
+        const editor = new RichTextEditor('#editor-target', {
+            placeholder: 'Type your awesome content here...',
+            autoSaveKey: 'landing-page-demo'
         });
     </script>
 </body>
-
 </html>

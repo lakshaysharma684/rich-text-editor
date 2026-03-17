@@ -2,22 +2,26 @@
 
 A lightweight, modular, and **dependency-free** Rich Text Editor built with modern JavaScript (ES6+).
 
-Designed for ease of use and performance, this editor provides a clean WYSIWYG experience without the bloat of heavy legacy libraries.
+[**🔴 View Live Demo (v1.3.0)**](https://lakshaysharma684.github.io/rich-text-editor/)
 
-[**🔴 View Live Demo**](https://lakshaysharma684.github.io/rich-text-editor/)
+## What's New in v1.3.0 🚀
 
-## Features
+- **Smart Paste Sanitizer**: Rewritten from scratch to strip font-sizes, font-families, and messy layout styles (Word/Google Docs) while preserving your design system's colors.
+- **Plain Text Paste Shortcut**: Use `Ctrl+Shift+V` (or `Cmd+Shift+V`) to instantly paste content as pure text without any formatting.
+- **onImageUpload Callback**: Support for asynchronous image uploads to your own server instead of base64 embedding.
+- **AutoSave Restore Banner**: New confirmation banner when an unsaved draft is found, preventing silent overwrites.
+- **Reliable Font Sizing**: Fixed legacy font-size bugs; now uses clean pixel-based `<span>` tags.
+
+## Core Features
 
 - **Zero Dependencies**: Pure JavaScript, lightweight and fast.
-- **Auto-Save**: Automatically saves content to LocalStorage to prevent data loss.
 - **Slash Commands**: Type `/` to access a quick menu for headings, lists, media, and more.
 - **Link Previews**: Hover over links to preview URLs, edit, or unlink.
 - **Syntax Highlighting**: Basic code block highlighting for JavaScript/HTML.
-- **Image Support**: Drag & Drop and Paste support (auto-converted to Base64).
+- **Image Support**: Drag & Drop and Paste support (auto-converted to Base64 or custom upload).
 - **Export Options**: Built-in support to export content as **Markdown** or **PDF**.
 - **Clean Output**: Generates semantic HTML5 output with optional **minification**.
 - **Shared Styling**: Comes with a dedicated CSS file for Editor and Preview modes.
-- **Modular Architecture**: Built with ES Modules for tree-shaking and maintainability.
 
 ## Installation & Usage
 
