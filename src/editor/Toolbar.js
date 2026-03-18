@@ -404,76 +404,14 @@ export default class Toolbar {
     }
 
     checkOverflow() {
+        // User requested to show all buttons without dropdown
         if (!this.container) return;
-
-        // Reset visibility
-        const elements = Array.from(this.container.children);
+        const elements = Array.from(this.container.children).filter(el => !el.classList.contains('rte-more-wrapper'));
         elements.forEach(el => {
-            if (!el.classList.contains('rte-more-wrapper')) {
-                el.style.display = '';
-            }
+            el.style.display = '';
+            el.style.visibility = 'visible';
         });
-
-        // Remove existing more button if any
         const existingMore = this.container.querySelector('.rte-more-wrapper');
         if (existingMore) existingMore.remove();
-
-        const containerWidth = this.container.offsetWidth;
-        let currentWidth = 0;
-        const overflowItems = [];
-        const gap = 4; // Gap between buttons
-
-        elements.forEach((el, index) => {
-            currentWidth += el.offsetWidth + gap;
-            
-            // If we're getting close to the end, start hiding
-            // Leave space for the 'More' button (approx 40px)
-            if (currentWidth > containerWidth - 45) {
-                overflowItems.push(el);
-            }
-        });
-
-        if (overflowItems.length > 0) {
-            // Create More Button
-            const moreWrapper = document.createElement('div');
-            moreWrapper.className = 'rte-dropdown-wrapper rte-more-wrapper';
-            
-            const moreBtn = document.createElement('button');
-            moreBtn.className = 'rte-toolbar-btn';
-            moreBtn.innerHTML = '...';
-            moreBtn.title = 'More';
-            moreBtn.setAttribute('aria-label', 'More options');
-
-            const moreMenu = document.createElement('div');
-            moreMenu.className = 'rte-dropdown-menu rte-more-menu';
-
-            overflowItems.forEach(item => {
-                // If it's a button, clone its logic into a menu item
-                const clone = document.createElement('div');
-                clone.className = 'rte-dropdown-item';
-                
-                if (item.classList.contains('rte-toolbar-divider')) {
-                    clone.className = 'rte-dropdown-divider';
-                } else if (item.querySelector('select')) {
-                    clone.innerText = item.querySelector('select').title || 'Option';
-                } else {
-                    clone.innerHTML = item.innerHTML;
-                    clone.title = item.title;
-                    clone.onclick = () => item.click();
-                }
-                
-                moreMenu.appendChild(clone);
-                item.style.display = 'none';
-            });
-
-            moreBtn.onclick = (e) => {
-                e.stopPropagation();
-                moreMenu.classList.toggle('show');
-            };
-
-            moreWrapper.appendChild(moreBtn);
-            moreWrapper.appendChild(moreMenu);
-            this.container.appendChild(moreWrapper);
-        }
     }
 }

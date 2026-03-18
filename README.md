@@ -1,98 +1,136 @@
 # @lakshaykumar/rich-text-editor
 
-A lightweight, modular, and **dependency-free** Rich Text Editor built with modern JavaScript (ES6+).
+A lightweight, modular, and **dependency-free** Rich Text Editor platform built with modern JavaScript (ES6+). Optimized for performance, accessibility, and professional-grade extensibility.
 
-[**🔴 View Live Demo (v1.4.1)**](https://lakshaysharma684.github.io/rich-text-editor/)
+[**🔴 View Live Demo**](https://lakshaysharma684.github.io/rich-text-editor/)
 
-## What's New in v1.4.1 🚀
-This major update transforms the library into an extensible platform:
-- **Custom Plugin & Command System**: Add your own buttons and commands to the toolbar without modifying the core library.
-- **Interactive Table Resizer**: Professional-grade table column resizing with visual handles.
-- **Advanced Markdown Shortcuts**: Support for inline patterns like `**bold**`, `_italic_`, `` `code` ``, and `[links](url)`.
-- **Mobile Responsive Toolbar**: Intelligent overflow menu ("...") for smaller screens.
-- **Pro Image Handling**: Aspect ratio locking (hold `Shift`) and alignment presets (Left, Center, Right, Full).
-- **Accessibility (A11y)**: Full ARIA labels, `role="textbox"` support, and standardized keyboard navigation.
+---
 
-## Core Features
-- **Zero Dependencies**: Pure JavaScript, lightweight and fast.
-- **Slash Commands**: Type `/` to access a quick menu for headings, lists, media, and more.
-- **Link Previews**: Hover over links to preview URLs, edit, or unlink.
-- **Syntax Highlighting**: Basic code block highlighting for JavaScript/HTML.
-- **Export Options**: Built-in support to export content as **Markdown** or **PDF**.
-- **AutoSave**: Robust local storage persistence with "Unsaved Draft" recovery.
+## 🚀 Key Features at a Glance
 
-## Installation & Usage
+### 🛠️ Extensible Platform
+- **Custom Plugin System**: Register your own commands and buttons easily.
+- **Custom Context Menu**: Fully configurable right-click menu with support for icons, labels, and dividers.
+- **Advanced Command Registry**: Dynamically bind logic to standard or custom commands.
 
-### Method 1: NPM (Recommended)
+### 📋 Professional Editing
+- **Interactive Table Resizer**: Drag-to-resize columns visually with real-time feedback.
+- **Image Pro-Handling**: Preset alignments (Left, Center, Right, Full) and aspect ratio locking (hold `Shift`).
+- **Markdown Shortcuts**: Real-time transformation of `**bold**`, `_italic_`, `` `code` ``, and `[links](url)`.
+- **Slash Commands**: Type `/` to access a quick-insert menu for media, headings, and formatting.
+
+### ⚡ Performance & UX
+- **Zero Dependencies**: Lightweight footprint, no external libraries required.
+- **Full-Width Wrapping Toolbar**: Zero-dropdown design—all tools are visible at once and wrap gracefully on any screen size.
+- **Smart Status Bar**: Detailed real-time stats including Word, Character, and Line counts + Selection info.
+- **Auto-Save (Optional)**: Optional local persistence to prevent data loss across sessions.
+
+---
+
+## 📦 Installation
+
 ```bash
 npm install @lakshaykumar/rich-text-editor
 ```
 
+---
+
+## 🛠️ Getting Started
+
+### 1. Basic Setup
 ```javascript
 import RichTextEditor from '@lakshaykumar/rich-text-editor';
 import '@lakshaykumar/rich-text-editor/src/styles/rte.css';
 
-const editor = new RichTextEditor('#my-editor', {
+const editor = new RichTextEditor('#editor-container', {
     placeholder: 'Start writing...',
+    enableAutoSave: true // Now disabled by default (false)
+});
+```
+
+### 2. Custom Buttons & Commands
+Add your own tools to the toolbar seamlessly:
+```javascript
+const editor = new RichTextEditor('#editor', {
     customButtons: [
         {
             label: '🎁',
-            title: 'Insert Product',
-            command: 'insertProduct',
+            title: 'Insert Gift',
+            command: 'insertGift',
             action: (editor) => {
-                const id = prompt("Product ID:");
-                if (id) editor.handleCommand('insertHTML', `<div class="product-embed">Product ${id}</div>`);
+                editor.handleCommand('insertHTML', '🎁');
             }
         }
     ]
 });
+
+// Or register a command separately
+editor.registerCommand('insertGift', (editor) => {
+    editor.handleCommand('insertHTML', '🎁');
+});
 ```
 
-### Method 2: CDN
-```html
-<link rel="stylesheet" href="https://unpkg.com/@lakshaykumar/rich-text-editor@latest/src/styles/rte.css">
-<script src="https://unpkg.com/@lakshaykumar/rich-text-editor@latest/dist/rich-text-editor.min.js"></script>
-
-<script>
-    const editor = new RichTextEditor('#editor-container');
-</script>
-```
-
-## Advanced Features
-
-### Custom Plugins
-You can register global commands or add ad-hoc buttons:
+### 3. Custom Context Menu
+Configure what users see when they right-click:
 ```javascript
-const editor = new RichTextEditor('#target', {
-    customButtons: [{ label: '⭐', title: 'Featured', command: 'markFeatured' }]
-});
-
-// Register the logic for your command
-editor.registerCommand('markFeatured', (editor, value, target) => {
-    alert('Marked as featured!');
+const editor = new RichTextEditor('#editor', {
+    contextMenuItems: [
+        { label: 'Insert Star ⭐', icon: '⭐', action: (editor) => editor.handleCommand('insertHTML', '⭐') },
+        { label: 'Insert Check ✅', icon: '✅', action: (editor) => editor.handleCommand('insertHTML', '✅') },
+        { type: 'divider' },
+        { label: 'Clear All', icon: '🧹', action: (editor) => editor.clear() }
+    ]
 });
 ```
+
+---
+
+## ⌨️ Shortcuts & Commands
+
+### Inline Markdown
+Type these patterns followed by a `Space` to trigger instant transformation:
+- `# ` H1 / `## ` H2 / `### ` H3
+- `> ` Blockquote
+- `- ` Bullet List / `1. ` Numbered List
+- `**bold** ` → **bold**
+- `_italic_ ` → *italic*
+- `` `code` `` → `inline code`
+- `[Label](URL) ` → [Link]
 
 ### Keyboard Shortcuts
 - `Ctrl+K` / `Cmd+K`: Open Link Picker
-- `Alt+1` to `Alt+6`: Headings (H1-H6)
-- `Alt+0`: Paragraph
-- `Ctrl+Enter`: Exit blockquote or list
+- `Alt + 1` to `Alt + 6`: Headings (H1-H6)
+- `Alt + 0`: Paragraph
+- `Ctrl+Shift+V`: Paste as Plain Text
+- `Shift + Drag Image`: Lock aspect ratio while resizing
 
-### Markdown Shortcuts
-Type these followed by a `Space` to trigger:
-- `# ` H1 / `## ` H2
-- `> ` Blockquote
-- `**bold** ` → **bold**
-- `_italic_ ` → *italic*
-- `` `code` `` → `code`
-- `[Label](URL) ` → [Link]
+---
 
-## Methods & API
-- `editor.getHTML(minify = false)`: Get content.
-- `editor.setHTML(html)`: Set content.
-- `editor.clear()`: Reset editor.
-- `editor.registerCommand(name, callback)`: Add custom logic.
+## ⚙️ Configuration Options
 
-## License & Attribution
-MIT License. Created by **Lakshay Kumar**. Please maintain attribution to `@lakshaykumar/rich-text-editor` in your projects.
+| Option | Type | Default | Description |
+| :--- | :--- | :--- | :--- |
+| `placeholder` | `String` | `'Start typing...'` | Text shown when editor is empty |
+| `enableAutoSave` | `Boolean` | `false` | Enable/Disable local storage persistence |
+| `autoSaveKey` | `String` | `null` | Custom local storage key (auto-generated if null) |
+| `customButtons` | `Array` | `[]` | List of custom button objects to add to toolbar |
+| `contextMenuItems`| `Array` | `[]` | List of custom items for the right-click menu |
+
+---
+
+## 🛠️ API Methods
+
+- `editor.getHTML(minify = false)`: Returns the current HTML content of the editor.
+- `editor.setHTML(html)`: Sets the HTML content and updates the view.
+- `editor.clear()`: Resets the editor and clears any cached auto-save data.
+- `editor.handleCommand(cmd, value)`: Executes a standard or custom command.
+- `editor.updateStats()`: Forces a refresh of the status bar (useful after manual DOM edits).
+- `editor.registerCommand(name, callback)`: Adds new logic to the editor's command registry.
+
+---
+
+## 🔗 Links & Resources
+- **NPM Project**: [@lakshaykumar/rich-text-editor](https://www.npmjs.com/package/@lakshaykumar/rich-text-editor)
+- **Report Bugs**: [GitHub Issues](https://github.com/lakshaysharma684/rich-text-editor/issues)
+
+Developed with ❤️ by **Lakshay Kumar**. Licensed under MIT.

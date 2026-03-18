@@ -1,19 +1,20 @@
-import Toolbar from './Toolbar.js?v=1.4.1';
-import ImageHandler from './ImageHandler.js?v=1.4.1';
-import FloatingMenu from './FloatingMenu.js?v=1.4.1';
-import MarkdownShortcuts from './MarkdownShortcuts.js?v=1.4.1';
-import PasteSanitizer from './PasteSanitizer.js?v=1.4.1';
-import EmojiPicker from './EmojiPicker.js?v=1.4.1';
-import TablePicker from './TablePicker.js?v=1.4.1';
-import ImageResizer from './ImageResizer.js?v=1.4.1';
-import SearchReplace from './SearchReplace.js?v=1.4.1';
-import AutoSave from './AutoSave.js?v=1.4.1';
-import LinkTooltip from './LinkTooltip.js?v=1.4.1';
-import SlashMenu from './SlashMenu.js?v=1.4.1';
-import CodeHighlighter from './CodeHighlighter.js?v=1.4.1';
-import LinkPicker from './LinkPicker.js?v=1.4.1';
-import FileImporter from './FileImporter.js?v=1.4.1';
-import TableResizer from './TableResizer.js?v=1.4.1';
+import Toolbar from './Toolbar.js?v=1.4.2';
+import ImageHandler from './ImageHandler.js?v=1.4.2';
+import FloatingMenu from './FloatingMenu.js?v=1.4.2';
+import MarkdownShortcuts from './MarkdownShortcuts.js?v=1.4.2';
+import PasteSanitizer from './PasteSanitizer.js?v=1.4.2';
+import EmojiPicker from './EmojiPicker.js?v=1.4.2';
+import TablePicker from './TablePicker.js?v=1.4.2';
+import ImageResizer from './ImageResizer.js?v=1.4.2';
+import SearchReplace from './SearchReplace.js?v=1.4.2';
+import AutoSave from './AutoSave.js?v=1.4.2';
+import LinkTooltip from './LinkTooltip.js?v=1.4.2';
+import SlashMenu from './SlashMenu.js?v=1.4.2';
+import CodeHighlighter from './CodeHighlighter.js?v=1.4.2';
+import LinkPicker from './LinkPicker.js?v=1.4.2';
+import FileImporter from './FileImporter.js?v=1.4.2';
+import TableResizer from './TableResizer.js?v=1.4.2';
+import ContextMenu from './ContextMenu.js?v=1.4.2';
 
 
 import Exporter from './Exporter.js';
@@ -28,9 +29,10 @@ export default class RichTextEditor {
         this.target = typeof target === 'string' ? document.querySelector(target) : target;
         this.options = {
             placeholder: 'Start typing...',
-            enableAutoSave: true,
+            enableAutoSave: false,
             autoSaveKey: null, // Custom key for local storage
             customButtons: [], // New in v1.4.0
+            contextMenuItems: [], // New in v1.5.0
             ...options
         };
 
@@ -100,7 +102,10 @@ export default class RichTextEditor {
             }
         });
         this.codeHighlighter = new CodeHighlighter(this.editorElement);
-        // this.fileImporter moved to top
+        
+        this.contextMenu = new ContextMenu(this, {
+            items: this.options.contextMenuItems
+        });
 
         if (this.options.enableAutoSave) {
             // Use provided key or fallback to a hash of the selector/page
@@ -111,6 +116,11 @@ export default class RichTextEditor {
                 this.updateStatus('Saved locally');
             });
         }
+
+        // Keep toolbar responsive on window resize
+        window.addEventListener('resize', () => {
+            if (this.toolbar) this.toolbar.checkOverflow();
+        });
 
         // Initial setup
         this.editorElement.focus();
@@ -240,32 +250,32 @@ export default class RichTextEditor {
     toggleSourceByView() {
         if (this.isSourceMode) {
             // Switch BACK to Visual Editor
-            // 1. Get code from textarea
             const html = this.sourceTextarea.value;
-            // 2. Set it to editor
             this.editorElement.innerHTML = html;
-            // 3. Toggle visibility
             this.sourceTextarea.style.display = 'none';
             this.editorElement.style.display = 'block';
             this.editorElement.focus();
             this.isSourceMode = false;
         } else {
             // Switch TO Source Mode
-            // Create textarea if not exists
             if (!this.sourceTextarea) {
                 this.sourceTextarea = document.createElement('textarea');
                 this.sourceTextarea.className = 'rte-source-view';
-                this.wrapper.insertBefore(this.sourceTextarea, this.statusBar); // Insert before status, after content
+                this.wrapper.insertBefore(this.sourceTextarea, this.statusBar);
             }
 
-            // 1. Get HTML
             const html = this.editorElement.innerHTML;
-            // 2. Format it slightly for readability (optional)
-            this.sourceTextarea.value = html; // or use a beautifier if allowed
+            this.sourceTextarea.value = html;
 
-            // 3. Toggle visibility
             this.editorElement.style.display = 'none';
             this.sourceTextarea.style.display = 'block';
+            
+            // Adjust height if not in fullscreen
+            if (!this.wrapper.classList.contains('rte-fullscreen')) {
+                const contentHeight = this.editorElement.offsetHeight;
+                this.sourceTextarea.style.height = `${Math.max(200, contentHeight)}px`;
+            }
+
             this.sourceTextarea.focus();
             this.isSourceMode = true;
         }
@@ -453,6 +463,9 @@ export default class RichTextEditor {
         this.wrapper.appendChild(this.statusBar);
 
         this.editorElement.addEventListener('input', () => this.updateStats());
+        this.editorElement.addEventListener('mouseup', () => this.updateStats());
+        this.editorElement.addEventListener('keyup', () => this.updateStats());
+        
         // Also update on init
         this.updateStats();
     }
@@ -460,10 +473,24 @@ export default class RichTextEditor {
     updateStats() {
         const text = this.editorElement.innerText || '';
         const charCount = text.length;
-        // Simple word count: split by whitespace and filter empty
         const wordCount = text.trim().split(/\s+/).filter(w => w.length > 0).length;
+        const lineCount = text.split(/\r|\r\n|\n/).length;
 
-        this.statusBar.innerHTML = `<span>${wordCount} words</span><span>${charCount} chars</span> <span class="rte-status-msg" style="margin-left:auto;font-style:italic;opacity:0.7"></span>`;
+        // Selection info
+        const selection = window.getSelection();
+        let selectionInfo = '';
+        if (selection.rangeCount > 0 && !selection.isCollapsed && this.editorElement.contains(selection.anchorNode)) {
+            const selectedText = selection.toString();
+            selectionInfo = ` | Selected: ${selectedText.length} chars`;
+        }
+
+        this.statusBar.innerHTML = `
+            <span>${wordCount} words</span>
+            <span>${charCount} chars</span>
+            <span>${lineCount} lines</span>
+            <span class="rte-selection-info" style="color:#3b82f6; font-weight:500;">${selectionInfo}</span>
+            <span class="rte-status-msg" style="margin-left:auto;font-style:italic;opacity:0.7"></span>
+        `;
     }
 
     updateStatus(msg) {

@@ -1,5 +1,13 @@
 # Changelog
 
+## v1.4.2 — Context Menu & UI Refinement
+- **NEW: Custom Context Menu**: Added professional right-click support with configurable items and icons.
+- **IMPROVEMENT: Unified Wrapping Toolbar**: Replaced the overflow dropdown with a multi-line wrapping toolbar for better accessibility.
+- **IMPROVEMENT: Tooltip Support**: Added hover tooltips to all toolbar buttons for better usability.
+- **IMPROVEMENT: Premium UI Redesign**: Modernized layouts across all demo and preview pages with high-end aesthetics.
+- **IMPROVEMENT: Optional Auto-Save**: Auto-save is now disabled by default for a cleaner initial experience.
+- **FIX: Source View Height**: Corrected the source code textarea to dynamically match the editor's height.
+
 ## v1.4.1 — Example Updates & Bug Fixes
 - **FIX:** Updated all example files (`index.html`, `demo-editor.html`, `demo-preview.html`) to reference the latest version and features.
 - **FIX:** Resolved caching issues in unit tests by implementing versioned imports.

@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rich Text Editor v1.4.1 — Lightweight & Modular</title>
-    <!-- Use Local Styles (GitHub Pages will find them via relative path) -->
+    <title>Rich Text Editor v1.4.2 — Lightweight & Modular</title>
     <link rel="stylesheet" href="src/styles/rte.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -38,27 +37,28 @@
 
         .hero {
             text-align: center;
-            padding: 4rem 2rem 2rem;
+            padding: 5rem 2rem 3rem;
             max-width: 1000px;
             margin: 0 auto;
         }
 
         h1 {
             font-family: 'Outfit', sans-serif;
-            font-size: 3rem;
+            font-size: 3.5rem;
             font-weight: 800;
             margin-bottom: 0.5rem;
             background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
             -webkit-background-clip: text;
             background-clip: text;
             -webkit-text-fill-color: transparent;
+            line-height: 1.1;
         }
 
         .version-badge {
             display: inline-block;
             background: #6366f1;
             color: white;
-            padding: 4px 12px;
+            padding: 4px 14px;
             border-radius: 999px;
             font-weight: 700;
             font-size: 0.85rem;
@@ -69,72 +69,74 @@
         .hero p {
             font-size: 1.25rem;
             color: #64748b;
-            max-width: 600px;
+            max-width: 650px;
             margin: 0 auto 2.5rem;
         }
 
-        .editor-container-outer {
-            max-width: 900px;
-            margin: 0 auto 4rem;
-            padding: 0 1rem;
+        .editor-section {
+            max-width: 1000px;
+            margin: 0 auto 5rem;
+            padding: 0 1.5rem;
         }
 
-        #editor-target {
+        #editor-container {
             background: var(--card-bg);
-            border-radius: 12px;
-            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04);
-            min-height: 400px;
+            border-radius: 16px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            border: 1px solid var(--border);
         }
 
         .features-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 1.5rem;
             max-width: 1000px;
-            margin: 0 auto 4rem;
-            padding: 0 2rem;
+            margin: 0 auto 5rem;
+            padding: 0 1.5rem;
         }
 
         .feature-card {
             background: var(--card-bg);
-            padding: 1.5rem;
-            border-radius: 16px;
+            padding: 2rem;
+            border-radius: 20px;
             border: 1px solid var(--border);
             text-align: left;
-            transition: transform 0.2s, box-shadow 0.2s;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .feature-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 12px 20px rgba(0,0,0,0.05);
+            transform: translateY(-8px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05);
+            border-color: var(--primary);
         }
 
         .feature-tag {
-            font-size: 0.7rem;
+            font-size: 0.75rem;
             font-weight: 800;
             text-transform: uppercase;
-            padding: 2px 8px;
-            border-radius: 4px;
-            margin-bottom: 0.75rem;
+            padding: 4px 10px;
+            border-radius: 6px;
+            margin-bottom: 1rem;
             display: inline-block;
         }
 
         .tag-new { background: #dcfce7; color: #166534; }
         .tag-fix { background: #fee2e2; color: #991b1b; }
 
-        .feature-card h3 { margin: 0 0 0.5rem; font-size: 1.1rem; }
-        .feature-card p { margin: 0; color: #64748b; font-size: 0.9rem; }
+        .feature-card h3 { margin: 0 0 0.75rem; font-size: 1.25rem; font-family: 'Outfit', sans-serif; }
+        .feature-card p { margin: 0; color: #64748b; font-size: 0.95rem; }
 
         .actions {
             display: flex;
             justify-content: center;
-            gap: 1rem;
-            margin-bottom: 4rem;
+            gap: 1.5rem;
+            margin-bottom: 5rem;
         }
 
         .btn {
-            padding: 10px 24px;
-            border-radius: 8px;
+            padding: 12px 28px;
+            border-radius: 10px;
             font-weight: 600;
             cursor: pointer;
             border: none;
@@ -142,112 +144,110 @@
             text-decoration: none;
             display: inline-flex;
             align-items: center;
+            gap: 8px;
         }
 
         .btn-primary { background: var(--primary); color: white; }
-        .btn-primary:hover { background: var(--primary-hover); transform: scale(1.02); }
+        .btn-primary:hover { background: var(--primary-hover); transform: translateY(-2px); box-shadow: 0 8px 15px rgba(99, 102, 241, 0.2); }
         .btn-secondary { background: #e2e8f0; color: #475569; }
-        .btn-secondary:hover { background: #cbd5e1; }
+        .btn-secondary:hover { background: #cbd5e1; transform: translateY(-2px); }
 
         footer {
             text-align: center;
-            padding: 4rem 2rem;
-            background: #1e293b;
+            padding: 5rem 2rem;
+            background: #0f172a;
             color: #94a3b8;
-            font-size: 0.9rem;
         }
 
-        .footer-links { margin-top: 1rem; display: flex; justify-content: center; gap: 2rem; }
-        .footer-links a { color: #f1f5f9; text-decoration: none; font-weight: 500; }
+        .footer-content { max-width: 1000px; margin: 0 auto; }
+        .footer-links { margin-top: 1.5rem; display: flex; justify-content: center; gap: 2.5rem; }
+        .footer-links a { color: #f1f5f9; text-decoration: none; font-weight: 500; transition: color 0.2s; }
+        .footer-links a:hover { color: var(--primary); }
+
+        /* Smooth scroll */
+        html { scroll-behavior: smooth; }
     </style>
 </head>
 <body>
 
     <section class="hero">
-        <h1>Rich Text Editor <span class="version-badge">v1.4.1</span></h1>
-        <h1>Dependency-Free Rich Text Editor</h1>
-        <p>A lightweight, modular, and dependency-free editor with smart paste sanitization, auto-save, and powerful shortcuts.</p>
+        <div class="version-badge">v1.4.2 Released</div>
+        <h1>Modern Rich Text Editor</h1>
+        <p>A lightweight, dependency-free, and professional editor platform. Built for developers who value performance and extensibility.</p>
         
         <div class="actions">
-            <a href="https://github.com/lakshaysharma684/rich-text-editor" class="btn btn-primary">GitHub Repo</a>
-            <a href="demo-editor.html" class="btn btn-secondary">Advanced Demo</a>
+            <a href="https://github.com/lakshaysharma684/rich-text-editor" class="btn btn-primary">
+                GitHub Repository
+            </a>
+            <a href="demo-editor.html" class="btn btn-secondary">Explore Advanced Demo</a>
         </div>
     </section>
 
-    <div class="editor-container-outer">
-        <div id="editor-target">
-            <h2>Welcome to v1.3.1! 🚀</h2>
-    <header class="header">
-        <h1>RichTextEditor <span style="font-size: 0.5em; vertical-align: middle; background: #3b82f6; color: white; padding: 2px 8px; border-radius: 99px;">v1.4.1</span></h1>
-        <p>A lightweight, professional-grade, and extensible rich text platform.</p>
-    </header>
-
-    <main class="container">
+    <div class="editor-section">
         <div id="editor-container">
-            <p>Welcome to the <b>Rich Text Editor v1.4.1</b>!</p>
+            <p>Welcome to the <b>Rich Text Editor v1.4.2</b>!</p>
             <p>This update transforms the editor into a powerful extensible platform.</p>
             
-            <h3>New Professional Features:</h3>
+            <h3>Pro Tier Features:</h3>
             <ul>
-                <li><b>Custom Plugin System</b>: Add your own buttons like the "Gift" icon above!</li>
-                <li><b>Table Resizing</b>: Hover over table borders and drag to resize columns.</li>
-                <li><b>Advanced Markdown</b>: Try typing <code>**bold**</code> or <code>[Google](https://google.com)</code> followed by a space.</li>
-                <li><b>Mobile Responsive</b>: Resize your browser to see the toolbar overflow into a "More" menu.</li>
+                <li><b>Custom Plugin System</b>: Right-click anywhere or use the toolbar to see custom commands.</li>
+                <li><b>Table Resizing</b>: Drag borders to adjust table columns with precision.</li>
+                <li><b>Markdown Power</b>: Dynamic transformations for `**bold**`, `_italic_`, and links.</li>
+                <li><b>No-Dropdown Toolbar</b>: All tools stay accessible, always visible.</li>
             </ul>
 
-            <table style="width:100%; border-collapse:collapse;">
+            <table style="width:100%; border-collapse:collapse; margin: 1.5em 0;">
                 <thead>
                     <tr>
-                        <th style="border:1px solid #ccc; padding:8px;">Feature</th>
-                        <th style="border:1px solid #ccc; padding:8px;">Status</th>
+                        <th style="border:1px solid #e2e8f0; padding:12px; background:#f8fafc; text-align:left;">Component</th>
+                        <th style="border:1px solid #e2e8f0; padding:12px; background:#f8fafc; text-align:left;">Status</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr>
-                        <td style="border:1px solid #ccc; padding:8px;">Plugin System</td>
-                        <td style="border:1px solid #ccc; padding:8px;">✅ Ready</td>
+                        <td style="border:1px solid #e2e8f0; padding:12px;">Responsive Toolbar</td>
+                        <td style="border:1px solid #e2e8f0; padding:12px;">✨ Optimized</td>
                     </tr>
                     <tr>
-                        <td style="border:1px solid #ccc; padding:8px;">Table Resizing</td>
-                        <td style="border:1px solid #ccc; padding:8px;">✅ Ready</td>
+                        <td style="border:1px solid #e2e8f0; padding:12px;">Context Menu</td>
+                        <td style="border:1px solid #e2e8f0; padding:12px;">⚡ Live</td>
                     </tr>
                 </tbody>
             </table>
             
             <p>Try the new <b>aspect ratio locking</b> by holding <code>Shift</code> while resizing the image below:</p>
-            <img src="https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=600&q=80" alt="Coding" style="width:300px; margin: 1em auto;">
+            <img src="https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=800&q=80" alt="Coding" style="width:100%; max-width:600px; margin: 2em auto; border-radius:12px;">
         </div>
-    </main>
+    </div>
 
     <div class="features-grid">
         <div class="feature-card">
             <span class="feature-tag tag-new">New</span>
-            <h3>Smart Paste Sanitizer</h3>
-            <p>Aggressively cleans pasted HTML while preserving colors and basic structure. No more broken layouts from Word or Google Docs.</p>
+            <h3>Custom Context Menu</h3>
+            <p>Right-click for quick access to copy, paste, and your own custom commands. Fully extensible via options.</p>
         </div>
         <div class="feature-card">
             <span class="feature-tag tag-new">New</span>
-            <h3>Plain Text Paste</h3>
-            <p>Introducing <code>Ctrl+Shift+V</code> (Cmd+Shift+V). Paste content as pure text, removing all styles in one go.</p>
+            <h3>Multi-line Toolbar</h3>
+            <p>Zero compromises on visibility. All formatting tools are available at first glance, wrapping gracefully on any screen.</p>
         </div>
         <div class="feature-card">
             <span class="feature-tag tag-fix">Fix</span>
-            <h3>AutoSave Restore Banner</h3>
-            <p>Never lose work again. A non-intrusive banner appears if an unsaved draft is found, giving you the choice to restore or discard.</p>
-        </div>
-        <div class="feature-card">
-            <span class="feature-tag tag-fix">Fix</span>
-            <h3>Reliable Font Sizes</h3>
-            <p>Rewritten font-size handling that ensures consistent pixel-based sizing across all browsers.</p>
+            <h3>Total Information View</h3>
+            <p>The status bar now provides comprehensive stats including word count, characters, and real-time selection info.</p>
         </div>
     </div>
 
     <footer>
-        <p>Built with ❤️ by Lakshay Kumar</p>
-        <div class="footer-links">
-            <a href="https://github.com/lakshaysharma684/rich-text-editor">GitHub</a>
-            <a href="https://www.npmjs.com/package/@lakshaykumar/rich-text-editor">NPM</a>
-            <a href="demo-preview.html">Preview Demo</a>
+        <div class="footer-content">
+            <p>Built with ❤️ by <strong>Lakshay Kumar</strong></p>
+            <div class="footer-links">
+                <a href="https://github.com/lakshaysharma684/rich-text-editor">GitHub</a>
+                <a href="https://www.npmjs.com/package/@lakshaykumar/rich-text-editor">NPM Registry</a>
+                <a href="demo-preview.html">Preview Mode</a>
+                <a href="demo-editor.html">Editor Demo</a>
+            </div>
+            <p style="margin-top: 2rem; font-size: 0.8rem; opacity: 0.5;">© 2026 MIT License</p>
         </div>
     </footer>
 
@@ -257,24 +257,12 @@
         const editor = new RichTextEditor('#editor-container', {
             placeholder: 'Start building something great...',
             enableAutoSave: true,
-            customButtons: [
-                {
-                    label: '🎁',
-                    title: 'Insert Product',
-                    command: 'insertProduct',
-                    action: (editor) => {
-                        const id = prompt("Product ID (try '123'):");
-                        if (id) {
-                            document.execCommand('insertHTML', false, `<div class="product-embed" style="background:#f1f5f9; padding:10px; border-radius:8px; border:1px solid #cbd5e1; margin:10px 0; display:inline-block;">🎁 Product #${id}</div>`);
-                        }
-                    }
-                }
+            contextMenuItems: [
+                { label: 'Insert Star ⭐', icon: '⭐', action: (editor) => editor.handleCommand('insertHTML', '⭐') },
+                { label: 'Insert Check ✅', icon: '✅', action: (editor) => editor.handleCommand('insertHTML', '✅') },
+                { type: 'divider' },
+                { label: 'Clear Editor', icon: '🧹', action: (editor) => editor.clear() }
             ]
-        });
-
-        // Register custom command
-        editor.registerCommand('insertProduct', (editor, value) => {
-            console.log('Custom command "insertProduct" triggered');
         });
 
         window.editor = editor;

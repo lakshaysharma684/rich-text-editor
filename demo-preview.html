@@ -1,174 +1,26 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Article Preview (Read Only) — v1.4.1</title>
+    <title>Preview Mode — Rich Text Editor v1.4.2</title>
     <link rel="stylesheet" href="src/styles/rte.css">
     <style>
-        body {
-            font-family: sans-serif;
-            padding: 20px;
-            background: #f8fafc;
-        }
-
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-        }
-
-        h1.page-title {
-            text-align: center;
-            color: #334155;
-            margin-bottom: 6px;
-        }
-
-        .subtitle {
-            text-align: center;
-            color: #64748b;
-            font-size: 14px;
-            margin-bottom: 32px;
-        }
-
-        .article-card {
-            border: 1px solid #e2e8f0;
-            border-radius: 10px;
-            overflow: hidden;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.07);
-            background: #fff;
-        }
-
-        .article-meta {
-            padding: 14px 24px;
-            background: #f1f5f9;
-            border-bottom: 1px solid #e2e8f0;
-            font-size: 13px;
-            color: #64748b;
-            display: flex;
-            gap: 16px;
-            flex-wrap: wrap;
-        }
-
-        .article-meta span {
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
-
-        /* Paste sanitizer demo callout */
-        .paste-demo-note {
-            margin: 24px 0 0 0;
-            background: #eff6ff;
-            border: 1px solid #bfdbfe;
-            border-radius: 8px;
-            padding: 14px 18px;
-            font-size: 13px;
-            color: #1e40af;
-            line-height: 1.6;
-        }
-
-        .paste-demo-note strong { display: block; margin-bottom: 4px; font-size: 14px; }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 1em 0;
-        }
-
-        th, td {
-            border: 1px solid #cbd5e1;
-            padding: 8px 12px;
-            text-align: left;
-            font-size: 13px;
-        }
-
-        th {
-            background: #f8fafc;
-            font-weight: 600;
-            color: #334155;
-        }
+        body { font-family: 'Inter', sans-serif; padding: 50px 20px; background: #fafafa; }
+        .preview-container { max-width: 800px; margin: 0 auto; background: #fff; padding: 40px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); }
+        h1 { text-align: center; margin-bottom: 40px; opacity: 0.8; }
+        .back-link { display: block; text-align: center; margin-top: 30px; color: #6366f1; text-decoration: none; font-weight: 600; }
     </style>
 </head>
-
 <body>
-    <div class="container">
-        <h1 class="page-title">Static Content Preview</h1>
-        <p class="subtitle">This page demonstrates how editor output renders using the <code>rte-content</code> class.</p>
-
-        <div class="article-card">
-            <div class="article-meta">
-                <span>📅 March 2026</span>
-                <span>✍️ Rich Text Editor v1.4.1</span>
-                <span>📖 Read-only preview</span>
-            </div>
-
-            <!--
-                This container uses the SAME class 'rte-content'
-            -->
-            <div class="rte-content">
-                <h1>What's New in v1.4.1</h1>
-                <p>This preview demonstrates content rendered exactly as it would appear from the editor. Version 1.4.1 introduces a range of professional features including <strong>Interactive Table Resizing</strong>, <strong>Advanced Markdown</strong>, and a powerful <strong>Plugin System</strong>.</p>
-
-                <blockquote>
-                    "Great UX means the tool gets out of the way and lets the content speak." — v1.3.1 Release Notes
-                </blockquote>
-
-                <h2>New Features at a Glance</h2>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Feature</th>
-                            <th>Type</th>
-                            <th>Details</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>Table Resizer</td>
-                            <td>✨ New</td>
-                            <td>Interactive column adjustment with visual handles</td>
-                        </tr>
-                        <tr>
-                            <td>Markdown Shortcuts</td>
-                            <td>✨ New</td>
-                            <td>Inline patterns (**bold**, _italic_, etc.)</td>
-                        </tr>
-                        <tr>
-                            <td>Plugin System</td>
-                            <td>✨ New</td>
-                            <td>Extensible toolbar and custom command API</td>
-                        </tr>
-                        <tr>
-                            <td>Responsive Toolbar</td>
-                            <td>✨ New</td>
-                            <td>Automatic overflow menu for mobile support</td>
-                        </tr>
-                        <tr>
-                            <td>Image Alignment</td>
-                            <td>✨ New</td>
-                            <td>Presets for Left, Center, Right, and Full Width</td>
-                        </tr>
-                    </tbody>
-                </table>
-
-                <h2>Style Allowlist</h2>
-                <p>When pasting, only the following CSS properties are preserved to ensure your application's design system is respected:</p>
-                <ul>
-                    <li><strong>Text elements:</strong> <code>color</code>, <code>background-color</code>, <code>text-align</code>, <code>font-weight</code>, <code>font-style</code>, <code>text-decoration</code>, <code>vertical-align</code></li>
-                    <li><strong>Structural elements</strong> (img, table, div, figure): all of the above + <code>border</code>, <code>width</code>, <code>height</code>, <code>margin</code>, <code>padding</code>, <code>float</code>, <code>overflow</code>, <code>object-fit</code>, <code>aspect-ratio</code></li>
-                </ul>
-
-                <p>End of preview. Open <a href="demo-editor.html">demo-editor.html</a> to try the editor interactively.</p>
-            </div>
+    <div class="preview-container">
+        <h1>Static Preview Mode</h1>
+        <div id="editor-preview" class="rte-content">
+            <h2>This is a static preview</h2>
+            <p>The <code>.rte-content</code> class can be used to style static content identically to the editor.</p>
+            <p>Try inspecting this page — there's no editor logic here, just pure CSS classes.</p>
         </div>
-
-        <div class="paste-demo-note">
-            <strong>💡 Paste Sanitizer Demo</strong>
-            Go to <a href="demo-editor.html">demo-editor.html</a>, copy content from a Google Doc or a website, and paste it into the editor. Notice that the text inherits the editor's typography instead of the source's font sizes and fonts.
-            Use <kbd>Ctrl+Shift+V</kbd> to paste as plain text at any time.
-        </div>
+        <a href="index.html" class="back-link">← Back to Editor</a>
     </div>
 </body>
-
 </html>

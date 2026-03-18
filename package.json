@@ -1,8 +1,12 @@
 {
     "name": "@lakshaykumar/rich-text-editor",
-    "version": "1.4.1",
+    "version": "1.4.2",
     "description": "A lightweight, modular, and dependency-free Rich Text Editor built with modern JavaScript.",
     "main": "src/editor/RichTextEditor.js",
+    "exports": {
+        ".": "./src/editor/RichTextEditor.js",
+        "./style": "./src/styles/rte.css"
+    },
     "type": "module",
     "files": [
         "src",
@@ -33,7 +37,10 @@
         "pdf-export",
         "document-editor",
         "web-component",
-        "no-dependencies"
+        "no-dependencies",
+        "context-menu",
+        "custom-commands",
+        "wrapping-toolbar"
     ],
     "author": "Lakshay Kumar",
     "license": "MIT",
