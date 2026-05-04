@@ -1,261 +1,483 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rich Text Editor v1.4.2 — Lightweight & Modular</title>
+    <title>Rich Text Editor v1.5.0 — Lightweight & Modular</title>
     <link rel="stylesheet" href="src/styles/rte.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
+        /* ---- Tokens ---- */
         :root {
+            --bg:      #f1f5f9;
+            --surface: #ffffff;
+            --text:    #0f172a;
+            --muted:   #64748b;
+            --border:  #e2e8f0;
             --primary: #6366f1;
+            --primary-dim: rgba(99,102,241,0.12);
             --primary-hover: #4f46e5;
-            --bg: #f8fafc;
-            --text: #1e293b;
-            --card-bg: #ffffff;
-            --border: #e2e8f0;
+            --tag-new-bg: #dcfce7; --tag-new: #166534;
+            --tag-fix-bg: #fee2e2; --tag-fix: #991b1b;
+            color-scheme: light dark;
         }
 
-        [data-theme="dark"] {
-            --bg: #0f172a;
-            --text: #f1f5f9;
-            --card-bg: #1e293b;
-            --border: #334155;
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg:      #0a0f1e;
+                --surface: #111827;
+                --text:    #f1f5f9;
+                --muted:   #94a3b8;
+                --border:  #1e293b;
+                --primary-dim: rgba(99,102,241,0.18);
+                --tag-new-bg: #14532d; --tag-new: #86efac;
+                --tag-fix-bg: #450a0a; --tag-fix: #fca5a5;
+            }
         }
+
+        *, *::before, *::after { box-sizing: border-box; }
 
         body {
-            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            font-family: 'Inter', system-ui, sans-serif;
             background: var(--bg);
             color: var(--text);
-            line-height: 1.6;
             margin: 0;
             padding: 0;
-            transition: background 0.3s, color 0.3s;
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
         }
 
+        /* ---- Nav ---- */
+        .nav {
+            position: sticky;
+            top: 0;
+            z-index: 200;
+            height: 56px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 2rem;
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            backdrop-filter: blur(12px);
+        }
+
+        .nav-brand {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 700;
+            font-size: 1rem;
+            color: var(--primary);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .version-pill {
+            background: var(--primary);
+            color: #fff;
+            font-size: 0.65rem;
+            font-weight: 700;
+            padding: 2px 7px;
+            border-radius: 99px;
+            letter-spacing: 0.02em;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .nav-links a {
+            color: var(--muted);
+            text-decoration: none;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: color 0.15s;
+        }
+
+        .nav-links a:hover { color: var(--text); }
+
+        /* ---- Hero ---- */
         .hero {
             text-align: center;
-            padding: 5rem 2rem 3rem;
-            max-width: 1000px;
+            padding: 5rem 1.5rem 3.5rem;
+            max-width: 720px;
             margin: 0 auto;
         }
 
-        h1 {
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: var(--primary-dim);
+            color: var(--primary);
+            border: 1px solid rgba(99,102,241,0.25);
+            padding: 5px 14px;
+            border-radius: 99px;
+            font-size: 0.78rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            letter-spacing: 0.01em;
+        }
+
+        .hero h1 {
             font-family: 'Outfit', sans-serif;
-            font-size: 3.5rem;
+            font-size: clamp(2.4rem, 5vw, 3.5rem);
             font-weight: 800;
-            margin-bottom: 0.5rem;
-            background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+            margin: 0 0 1rem;
+            background: linear-gradient(135deg, var(--primary) 0%, #a855f7 100%);
             -webkit-background-clip: text;
             background-clip: text;
             -webkit-text-fill-color: transparent;
             line-height: 1.1;
         }
 
-        .version-badge {
-            display: inline-block;
-            background: #6366f1;
-            color: white;
-            padding: 4px 14px;
-            border-radius: 999px;
-            font-weight: 700;
-            font-size: 0.85rem;
-            margin-bottom: 1.5rem;
-            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
-        }
-
         .hero p {
-            font-size: 1.25rem;
-            color: #64748b;
-            max-width: 650px;
-            margin: 0 auto 2.5rem;
+            font-size: 1.1rem;
+            color: var(--muted);
+            max-width: 520px;
+            margin: 0 auto 2rem;
         }
 
-        .editor-section {
-            max-width: 1000px;
-            margin: 0 auto 5rem;
-            padding: 0 1.5rem;
+        .hero-actions {
+            display: flex;
+            justify-content: center;
+            gap: 0.75rem;
+            flex-wrap: wrap;
         }
 
-        #editor-container {
-            background: var(--card-bg);
-            border-radius: 16px;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
+        /* ---- Buttons ---- */
+        .btn {
+            padding: 10px 22px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.875rem;
+            cursor: pointer;
+            border: none;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.18s;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: #fff;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-hover);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 18px rgba(99,102,241,0.35);
+        }
+
+        .btn-ghost {
+            background: var(--surface);
+            color: var(--text);
             border: 1px solid var(--border);
         }
 
+        .btn-ghost:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            transform: translateY(-1px);
+        }
+
+        /* ---- Main content ---- */
+        .content {
+            max-width: 1040px;
+            margin: 0 auto;
+            padding: 0 1.5rem 6rem;
+        }
+
+        /* ---- Section ---- */
+        .section { margin-bottom: 2.5rem; }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 0.75rem;
+        }
+
+        .section-tag {
+            font-size: 0.68rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--primary);
+            background: var(--primary-dim);
+            padding: 3px 8px;
+            border-radius: 4px;
+        }
+
+        .section-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.15rem;
+            font-weight: 700;
+            margin: 0;
+            color: var(--text);
+        }
+
+        .section-desc {
+            font-size: 0.85rem;
+            color: var(--muted);
+            margin: 0 0 0.85rem;
+        }
+
+        /* ---- Editor card ---- */
+        .editor-card {
+            background: var(--surface);
+            border-radius: 14px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+            box-shadow: 0 1px 2px rgba(0,0,0,0.04), 0 8px 24px -8px rgba(0,0,0,0.08);
+        }
+
+        /* Editors side by side on wide screens */
+        .editors-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+
+        @media (max-width: 780px) {
+            .editors-grid { grid-template-columns: 1fr; }
+        }
+
+        /* ---- Feature cards ---- */
         .features-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 1.5rem;
-            max-width: 1000px;
-            margin: 0 auto 5rem;
-            padding: 0 1.5rem;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 1rem;
+            margin-bottom: 4rem;
         }
 
         .feature-card {
-            background: var(--card-bg);
-            padding: 2rem;
-            border-radius: 20px;
+            background: var(--surface);
+            padding: 1.4rem;
+            border-radius: 12px;
             border: 1px solid var(--border);
-            text-align: left;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.22s ease;
         }
 
         .feature-card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05);
+            transform: translateY(-4px);
+            box-shadow: 0 12px 28px rgba(0,0,0,0.07);
             border-color: var(--primary);
         }
 
         .feature-tag {
-            font-size: 0.75rem;
+            display: inline-block;
+            font-size: 0.67rem;
             font-weight: 800;
             text-transform: uppercase;
-            padding: 4px 10px;
-            border-radius: 6px;
-            margin-bottom: 1rem;
-            display: inline-block;
+            letter-spacing: 0.06em;
+            padding: 3px 8px;
+            border-radius: 4px;
+            margin-bottom: 0.7rem;
         }
 
-        .tag-new { background: #dcfce7; color: #166534; }
-        .tag-fix { background: #fee2e2; color: #991b1b; }
+        .tag-new { background: var(--tag-new-bg); color: var(--tag-new); }
+        .tag-fix { background: var(--tag-fix-bg); color: var(--tag-fix); }
 
-        .feature-card h3 { margin: 0 0 0.75rem; font-size: 1.25rem; font-family: 'Outfit', sans-serif; }
-        .feature-card p { margin: 0; color: #64748b; font-size: 0.95rem; }
-
-        .actions {
-            display: flex;
-            justify-content: center;
-            gap: 1.5rem;
-            margin-bottom: 5rem;
+        .feature-card h3 {
+            font-family: 'Outfit', sans-serif;
+            margin: 0 0 0.45rem;
+            font-size: 1rem;
+            color: var(--text);
         }
 
-        .btn {
-            padding: 12px 28px;
-            border-radius: 10px;
-            font-weight: 600;
-            cursor: pointer;
-            border: none;
-            transition: all 0.2s;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
+        .feature-card p {
+            margin: 0;
+            color: var(--muted);
+            font-size: 0.855rem;
+            line-height: 1.55;
         }
 
-        .btn-primary { background: var(--primary); color: white; }
-        .btn-primary:hover { background: var(--primary-hover); transform: translateY(-2px); box-shadow: 0 8px 15px rgba(99, 102, 241, 0.2); }
-        .btn-secondary { background: #e2e8f0; color: #475569; }
-        .btn-secondary:hover { background: #cbd5e1; transform: translateY(-2px); }
+        .feature-card code {
+            background: var(--primary-dim);
+            color: var(--primary);
+            padding: 1px 5px;
+            border-radius: 3px;
+            font-size: 0.8em;
+        }
 
+        /* ---- Footer ---- */
         footer {
             text-align: center;
-            padding: 5rem 2rem;
+            padding: 3rem 2rem;
             background: #0f172a;
             color: #94a3b8;
+            font-size: 0.875rem;
         }
 
-        .footer-content { max-width: 1000px; margin: 0 auto; }
-        .footer-links { margin-top: 1.5rem; display: flex; justify-content: center; gap: 2.5rem; }
-        .footer-links a { color: #f1f5f9; text-decoration: none; font-weight: 500; transition: color 0.2s; }
-        .footer-links a:hover { color: var(--primary); }
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
 
-        /* Smooth scroll */
-        html { scroll-behavior: smooth; }
+        .footer-links a {
+            color: #f1f5f9;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.15s;
+        }
+
+        .footer-links a:hover { color: #6366f1; }
     </style>
 </head>
 <body>
 
+    <!-- Nav -->
+    <nav class="nav">
+        <a href="#" class="nav-brand">
+            RTE <span class="version-pill">v1.5.0</span>
+        </a>
+        <div class="nav-links">
+            <a href="demo-editor.html">Advanced Demo</a>
+            <a href="demo-preview.html">Preview</a>
+            <a href="https://github.com/lakshaysharma684/rich-text-editor">GitHub</a>
+        </div>
+    </nav>
+
+    <!-- Hero -->
     <section class="hero">
-        <div class="version-badge">v1.4.2 Released</div>
+        <div class="hero-badge">v1.5.0 — Toolbar Restriction + System Dark Mode</div>
         <h1>Modern Rich Text Editor</h1>
-        <p>A lightweight, dependency-free, and professional editor platform. Built for developers who value performance and extensibility.</p>
-        
-        <div class="actions">
-            <a href="https://github.com/lakshaysharma684/rich-text-editor" class="btn btn-primary">
-                GitHub Repository
-            </a>
-            <a href="demo-editor.html" class="btn btn-secondary">Explore Advanced Demo</a>
+        <p>Lightweight, zero-dependency, extensible. Built for developers who care about performance and UX.</p>
+        <div class="hero-actions">
+            <a href="https://github.com/lakshaysharma684/rich-text-editor" class="btn btn-primary">GitHub Repository</a>
+            <a href="demo-editor.html" class="btn btn-ghost">Explore Demo</a>
         </div>
     </section>
 
-    <div class="editor-section">
-        <div id="editor-container">
-            <p>Welcome to the <b>Rich Text Editor v1.4.2</b>!</p>
-            <p>This update transforms the editor into a powerful extensible platform.</p>
-            
-            <h3>Pro Tier Features:</h3>
-            <ul>
-                <li><b>Custom Plugin System</b>: Right-click anywhere or use the toolbar to see custom commands.</li>
-                <li><b>Table Resizing</b>: Drag borders to adjust table columns with precision.</li>
-                <li><b>Markdown Power</b>: Dynamic transformations for `**bold**`, `_italic_`, and links.</li>
-                <li><b>No-Dropdown Toolbar</b>: All tools stay accessible, always visible.</li>
-            </ul>
+    <!-- Editors -->
+    <div class="content">
 
-            <table style="width:100%; border-collapse:collapse; margin: 1.5em 0;">
-                <thead>
-                    <tr>
-                        <th style="border:1px solid #e2e8f0; padding:12px; background:#f8fafc; text-align:left;">Component</th>
-                        <th style="border:1px solid #e2e8f0; padding:12px; background:#f8fafc; text-align:left;">Status</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td style="border:1px solid #e2e8f0; padding:12px;">Responsive Toolbar</td>
-                        <td style="border:1px solid #e2e8f0; padding:12px;">✨ Optimized</td>
-                    </tr>
-                    <tr>
-                        <td style="border:1px solid #e2e8f0; padding:12px;">Context Menu</td>
-                        <td style="border:1px solid #e2e8f0; padding:12px;">⚡ Live</td>
-                    </tr>
-                </tbody>
-            </table>
-            
-            <p>Try the new <b>aspect ratio locking</b> by holding <code>Shift</code> while resizing the image below:</p>
-            <img src="https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=800&q=80" alt="Coding" style="width:100%; max-width:600px; margin: 2em auto; border-radius:12px;">
-        </div>
-    </div>
+        <div class="editors-grid">
 
-    <div class="features-grid">
-        <div class="feature-card">
-            <span class="feature-tag tag-new">New</span>
-            <h3>Custom Context Menu</h3>
-            <p>Right-click for quick access to copy, paste, and your own custom commands. Fully extensible via options.</p>
-        </div>
-        <div class="feature-card">
-            <span class="feature-tag tag-new">New</span>
-            <h3>Multi-line Toolbar</h3>
-            <p>Zero compromises on visibility. All formatting tools are available at first glance, wrapping gracefully on any screen.</p>
-        </div>
-        <div class="feature-card">
-            <span class="feature-tag tag-fix">Fix</span>
-            <h3>Total Information View</h3>
-            <p>The status bar now provides comprehensive stats including word count, characters, and real-time selection info.</p>
-        </div>
-    </div>
-
-    <footer>
-        <div class="footer-content">
-            <p>Built with ❤️ by <strong>Lakshay Kumar</strong></p>
-            <div class="footer-links">
-                <a href="https://github.com/lakshaysharma684/rich-text-editor">GitHub</a>
-                <a href="https://www.npmjs.com/package/@lakshaykumar/rich-text-editor">NPM Registry</a>
-                <a href="demo-preview.html">Preview Mode</a>
-                <a href="demo-editor.html">Editor Demo</a>
+            <!-- Full toolbar -->
+            <div class="section">
+                <div class="section-header">
+                    <span class="section-tag">Full toolbar</span>
+                    <h2 class="section-title">All features</h2>
+                </div>
+                <div class="editor-card">
+                    <div id="editor-container">
+                        <p>Welcome to <b>Rich Text Editor v1.5.0</b>.</p>
+                        <p>This version adds <code>toolbarItems</code> for restricting visible buttons, and automatic system dark mode.</p>
+                        <h3>What's new:</h3>
+                        <ul>
+                            <li><b>toolbarItems</b> — pass an array of commands, only those buttons render.</li>
+                            <li><b>System dark mode</b> — auto-matches OS preference, respects manual toggle.</li>
+                            <li><b>Improved editor layout</b> — cleaner toolbar, better typography, focus ring.</li>
+                        </ul>
+                        <table style="width:100%; border-collapse:collapse; margin: 1.25em 0; font-size: 14px;">
+                            <thead>
+                                <tr>
+                                    <th style="border:1px solid #e2e8f0; padding:8px 12px; background:#f8fafc; text-align:left;">Feature</th>
+                                    <th style="border:1px solid #e2e8f0; padding:8px 12px; background:#f8fafc; text-align:left;">Since</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td style="border:1px solid #e2e8f0; padding:8px 12px;">Custom Plugin System</td>
+                                    <td style="border:1px solid #e2e8f0; padding:8px 12px;">v1.4.0</td>
+                                </tr>
+                                <tr>
+                                    <td style="border:1px solid #e2e8f0; padding:8px 12px;">toolbarItems restriction</td>
+                                    <td style="border:1px solid #e2e8f0; padding:8px 12px;">v1.5.0</td>
+                                </tr>
+                                <tr>
+                                    <td style="border:1px solid #e2e8f0; padding:8px 12px;">System dark mode</td>
+                                    <td style="border:1px solid #e2e8f0; padding:8px 12px;">v1.5.0</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
-            <p style="margin-top: 2rem; font-size: 0.8rem; opacity: 0.5;">© 2026 MIT License</p>
+
+            <!-- Restricted toolbar -->
+            <div class="section">
+                <div class="section-header">
+                    <span class="section-tag">toolbarItems</span>
+                    <h2 class="section-title">Restricted toolbar</h2>
+                </div>
+                <p class="section-desc">Only bold, italic, underline, lists, clear formatting. Tables, emoji, video, import — all hidden.</p>
+                <div class="editor-card">
+                    <div id="editor-restricted">
+                        <p>This editor is intentionally minimal. Use for product descriptions, ingredient lists, or any field where only basic formatting makes sense.</p>
+                        <p>Try formatting — <b>bold</b>, <i>italic</i>, <u>underline</u>, and lists work. Everything else is gone.</p>
+                    </div>
+                </div>
+            </div>
+
         </div>
+
+        <!-- Feature cards -->
+        <div class="features-grid">
+            <div class="feature-card">
+                <span class="feature-tag tag-new">New</span>
+                <h3>Toolbar Restriction</h3>
+                <p>Pass <code>toolbarItems</code> to show only the buttons you need. Separators auto-collapse.</p>
+            </div>
+            <div class="feature-card">
+                <span class="feature-tag tag-new">New</span>
+                <h3>System Dark Mode</h3>
+                <p>Auto-matches OS preference. Manual toggle still works — once clicked, respects user choice.</p>
+            </div>
+            <div class="feature-card">
+                <span class="feature-tag tag-new">New</span>
+                <h3>Custom Context Menu</h3>
+                <p>Right-click for quick access to copy, paste, and your own custom commands. Fully extensible.</p>
+            </div>
+            <div class="feature-card">
+                <span class="feature-tag tag-new">New</span>
+                <h3>Multi-line Toolbar</h3>
+                <p>All tools always visible — wraps gracefully on any screen width. No hidden overflow menus.</p>
+            </div>
+            <div class="feature-card">
+                <span class="feature-tag tag-fix">Fix</span>
+                <h3>Status Bar</h3>
+                <p>Comprehensive stats: word count, chars, lines, and real-time selection info.</p>
+            </div>
+            <div class="feature-card">
+                <span class="feature-tag tag-new">New</span>
+                <h3>Table Resizing</h3>
+                <p>Drag column borders to adjust widths with precision. Aspect-ratio locking on image resize.</p>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <p>Built with ❤️ by <strong>Lakshay Kumar</strong></p>
+        <div class="footer-links">
+            <a href="https://github.com/lakshaysharma684/rich-text-editor">GitHub</a>
+            <a href="https://www.npmjs.com/package/@lakshaykumar/rich-text-editor">NPM</a>
+            <a href="demo-preview.html">Preview Mode</a>
+            <a href="demo-editor.html">Advanced Demo</a>
+        </div>
+        <p style="margin-top: 1.5rem; font-size: 0.75rem; opacity: 0.4;">© 2026 MIT License</p>
     </footer>
 
     <script type="module">
         import RichTextEditor from './src/editor/RichTextEditor.js';
 
         const editor = new RichTextEditor('#editor-container', {
-            placeholder: 'Start building something great...',
+            placeholder: 'Start writing...',
             enableAutoSave: true,
             contextMenuItems: [
                 { label: 'Insert Star ⭐', icon: '⭐', action: (editor) => editor.handleCommand('insertHTML', '⭐') },
@@ -265,7 +487,14 @@
             ]
         });
 
+        const restrictedEditor = new RichTextEditor('#editor-restricted', {
+            placeholder: 'Basic formatting only...',
+            toolbarItems: ['bold', 'italic', 'underline', 'insertUnorderedList', 'insertOrderedList', 'removeFormat']
+        });
+
         window.editor = editor;
+        window.restrictedEditor = restrictedEditor;
     </script>
+
 </body>
 </html>

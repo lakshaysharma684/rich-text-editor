@@ -1,22 +1,20 @@
-import Toolbar from './Toolbar.js?v=1.4.2';
-import ImageHandler from './ImageHandler.js?v=1.4.2';
-import FloatingMenu from './FloatingMenu.js?v=1.4.2';
-import MarkdownShortcuts from './MarkdownShortcuts.js?v=1.4.2';
-import PasteSanitizer from './PasteSanitizer.js?v=1.4.2';
-import EmojiPicker from './EmojiPicker.js?v=1.4.2';
-import TablePicker from './TablePicker.js?v=1.4.2';
-import ImageResizer from './ImageResizer.js?v=1.4.2';
-import SearchReplace from './SearchReplace.js?v=1.4.2';
-import AutoSave from './AutoSave.js?v=1.4.2';
-import LinkTooltip from './LinkTooltip.js?v=1.4.2';
-import SlashMenu from './SlashMenu.js?v=1.4.2';
-import CodeHighlighter from './CodeHighlighter.js?v=1.4.2';
-import LinkPicker from './LinkPicker.js?v=1.4.2';
-import FileImporter from './FileImporter.js?v=1.4.2';
-import TableResizer from './TableResizer.js?v=1.4.2';
-import ContextMenu from './ContextMenu.js?v=1.4.2';
-
-
+import Toolbar from './Toolbar.js';
+import ImageHandler from './ImageHandler.js';
+import FloatingMenu from './FloatingMenu.js';
+import MarkdownShortcuts from './MarkdownShortcuts.js';
+import PasteSanitizer from './PasteSanitizer.js';
+import EmojiPicker from './EmojiPicker.js';
+import TablePicker from './TablePicker.js';
+import ImageResizer from './ImageResizer.js';
+import SearchReplace from './SearchReplace.js';
+import AutoSave from './AutoSave.js';
+import LinkTooltip from './LinkTooltip.js';
+import SlashMenu from './SlashMenu.js';
+import CodeHighlighter from './CodeHighlighter.js';
+import LinkPicker from './LinkPicker.js';
+import FileImporter from './FileImporter.js';
+import TableResizer from './TableResizer.js';
+import ContextMenu from './ContextMenu.js';
 import Exporter from './Exporter.js';
 
 
@@ -30,9 +28,10 @@ export default class RichTextEditor {
         this.options = {
             placeholder: 'Start typing...',
             enableAutoSave: false,
-            autoSaveKey: null, // Custom key for local storage
-            customButtons: [], // New in v1.4.0
-            contextMenuItems: [], // New in v1.5.0
+            autoSaveKey: null,
+            customButtons: [],
+            contextMenuItems: [],
+            toolbarItems: null, // New in v1.5.0: restrict visible toolbar buttons
             ...options
         };
 
@@ -65,9 +64,10 @@ export default class RichTextEditor {
 
         this.toolbar = new Toolbar(this.toolbarElement, this.editorElement, {
             onImageClick: () => this.imageHandler.pickImage(),
-            onLinkClick: () => this.openLinkPicker(), // New handler
+            onLinkClick: () => this.openLinkPicker(),
             onCustomCommand: (cmd, val, target) => this.handleCommand(cmd, val, target),
-            customButtons: this.options.customButtons // Pass to toolbar
+            customButtons: this.options.customButtons,
+            toolbarItems: this.options.toolbarItems
         });
 
         this.floatingMenu = new FloatingMenu(this.editorElement);
@@ -121,6 +121,20 @@ export default class RichTextEditor {
         window.addEventListener('resize', () => {
             if (this.toolbar) this.toolbar.checkOverflow();
         });
+
+        // Sync with system color-scheme preference
+        const _mq = window.matchMedia('(prefers-color-scheme: dark)');
+        const _syncTheme = (isDark) => {
+            if (this._manualTheme) return;
+            this.wrapper.classList.toggle('rte-dark-mode', isDark);
+            this.isDarkMode = isDark;
+            if (this.slashMenu && this.slashMenu.menu) {
+                this.slashMenu.menu.classList.toggle('dark', isDark);
+            }
+            this.toolbar.updateButtonIcon('toggleTheme', isDark ? '☀️' : '🌙');
+        };
+        _syncTheme(_mq.matches);
+        _mq.addEventListener('change', (e) => _syncTheme(e.matches));
 
         // Initial setup
         this.editorElement.focus();
@@ -304,15 +318,14 @@ export default class RichTextEditor {
     }
 
     toggleTheme() {
+        this._manualTheme = true;
         this.wrapper.classList.toggle('rte-dark-mode');
         this.isDarkMode = this.wrapper.classList.contains('rte-dark-mode');
 
-        // Update Flash Menu Theme
         if (this.slashMenu && this.slashMenu.menu) {
             this.slashMenu.menu.classList.toggle('dark', this.isDarkMode);
         }
 
-        // Update Icon
         const icon = this.isDarkMode ? '☀️' : '🌙';
         this.toolbar.updateButtonIcon('toggleTheme', icon);
     }

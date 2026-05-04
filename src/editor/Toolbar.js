@@ -1,34 +1,24 @@
-/**
- * Toolbar functionality for the Rich Text Editor.
- * Manages buttons and executes formatting commands.
- */
 export default class Toolbar {
-    /**
-     * @param {HTMLElement} toolbarContainer - Element to stick buttons into
-     * @param {HTMLElement} editorElement - The contenteditable area
-     * @param {Object} options - Options like event handlers
-     */
     constructor(toolbarContainer, editorElement, options = {}) {
         this.container = toolbarContainer;
         this.editor = editorElement;
         this.options = options;
 
-        // Button definition: [Label, Command, Value]
         this.buttons = [
-            // 1. History (Leftmost for quick access)
-            { label: '↺', command: 'undo', title: 'Undo' },
-            { label: '↻', command: 'redo', title: 'Redo' },
+            // History
+            { label: '↺', command: 'undo',  title: 'Undo (Ctrl+Z)' },
+            { label: '↻', command: 'redo',  title: 'Redo (Ctrl+Y)' },
             { type: 'separator' },
 
-            // 2. Typography & Colors (Most used)
+            // Typography
             {
                 type: 'select', command: 'fontName', title: 'Font Family', options: [
-                    { label: 'Default', value: 'Inter, system-ui, sans-serif' },
-                    { label: 'Arial', value: 'Arial, sans-serif' },
-                    { label: 'Georgia', value: 'Georgia, serif' },
-                    { label: 'Courier', value: '"Courier New", monospace' },
-                    { label: 'Times', value: '"Times New Roman", serif' },
-                    { label: 'Verdana', value: 'Verdana, sans-serif' },
+                    { label: 'Default',    value: 'Inter, system-ui, sans-serif' },
+                    { label: 'Arial',      value: 'Arial, sans-serif' },
+                    { label: 'Georgia',    value: 'Georgia, serif' },
+                    { label: 'Courier',    value: '"Courier New", monospace' },
+                    { label: 'Times',      value: '"Times New Roman", serif' },
+                    { label: 'Verdana',    value: 'Verdana, sans-serif' },
                     { label: 'Comic Sans', value: '"Comic Sans MS", cursive' }
                 ]
             },
@@ -45,310 +35,306 @@ export default class Toolbar {
                     { label: '72px', value: '72px' }
                 ]
             },
-            { label: 'H1', command: 'formatBlock', value: 'H1', title: 'Heading 1' },
-            { label: 'H2', command: 'formatBlock', value: 'H2', title: 'Heading 2' },
-            { label: '<b>B</b>', command: 'bold', title: 'Bold' },
-            { label: '<i>I</i>', command: 'italic', title: 'Italic' },
-            { label: '<u>U</u>', command: 'underline', title: 'Underline' },
-            { label: '<s>S</s>', command: 'strikeThrough', title: 'Strikethrough' },
-            // Colors inline with text formatting
-            { label: '<span style="color:blue">A</span>', command: 'foreColor', type: 'color', title: 'Text Color' },
-            { label: '<span style="background:#eee;padding:0 2px">Bg</span>', command: 'hiliteColor', type: 'color', title: 'Background Color' },
+            { label: 'H1', command: 'formatBlock', value: 'H1', title: 'Heading 1 (Alt+1)' },
+            { label: 'H2', command: 'formatBlock', value: 'H2', title: 'Heading 2 (Alt+2)' },
             { type: 'separator' },
 
-            // 3. Structure & Alignment
-            { label: '•', command: 'insertUnorderedList', title: 'Bullet List' },
-            { label: '1.', command: 'insertOrderedList', title: 'Numbered List' },
-            { label: '⇠', command: 'justifyLeft', title: 'Align Left' },
-            { label: '⇿', command: 'justifyCenter', title: 'Align Center' },
-            { label: '⇢', command: 'justifyRight', title: 'Align Right' },
-            { label: '⇥', command: 'indent', title: 'Indent' },
-            { label: '⇤', command: 'outdent', title: 'Outdent' },
+            // Text formatting
+            { label: '<b>B</b>',   command: 'bold',         title: 'Bold (Ctrl+B)' },
+            { label: '<i>I</i>',   command: 'italic',       title: 'Italic (Ctrl+I)' },
+            { label: '<u>U</u>',   command: 'underline',    title: 'Underline (Ctrl+U)' },
+            { label: '<s>S</s>',   command: 'strikeThrough', title: 'Strikethrough' },
+            { label: '<span style="color:#3b82f6;font-weight:700">A</span>', command: 'foreColor',  type: 'color', title: 'Text Color' },
+            { label: '<span style="background:#fef08a;padding:0 3px;border-radius:2px">A</span>', command: 'hiliteColor', type: 'color', title: 'Highlight Color' },
             { type: 'separator' },
 
-            // 4. Inserts & Blocks
-            { label: '❝', command: 'formatBlock', value: 'BLOCKQUOTE', title: 'Quote' },
-            { label: '⟨/⟩', command: 'formatBlock', value: 'PRE', title: 'Code Block' },
-            { label: '🔗', command: 'createLink', needsValue: true, title: 'Insert Link' },
+            // Structure
+            { label: '≡',  command: 'insertUnorderedList', title: 'Bullet List' },
+            { label: '⋮≡', command: 'insertOrderedList',   title: 'Numbered List' },
+            { label: '⬅', command: 'justifyLeft',          title: 'Align Left' },
+            { label: '↔', command: 'justifyCenter',         title: 'Align Center' },
+            { label: '➡', command: 'justifyRight',          title: 'Align Right' },
+            { label: '→|', command: 'indent',               title: 'Indent' },
+            { label: '|←', command: 'outdent',              title: 'Outdent' },
             { type: 'separator' },
 
-            // 5. Media
-            { label: '😀', command: 'insertEmoji', title: 'Insert Emoji' },
-            { label: '🖼', command: 'customImage', title: 'Insert Image' },
-            { label: '▶', command: 'insertVideo', title: 'Insert Video' },
-            { label: '📂', command: 'customImport', title: 'Import Word/Docs' },
-            { label: '▦', command: 'insertTable', title: 'Insert Table' },
-            { label: '―', command: 'insertHorizontalRule', title: 'Horizontal Rule' },
+            // Blocks & inserts
+            { label: '❝',    command: 'formatBlock', value: 'BLOCKQUOTE', title: 'Blockquote' },
+            { label: '⟨/⟩', command: 'formatBlock', value: 'PRE',        title: 'Code Block' },
+            { label: '🔗',   command: 'createLink',  needsValue: true,    title: 'Insert Link (Ctrl+K)' },
             { type: 'separator' },
 
-            // 6. Tools (Right side)
-            { label: 'Tₓ', command: 'removeFormat', title: 'Clear Formatting' },
+            // Media
+            { label: '😀', command: 'insertEmoji',         title: 'Emoji' },
+            { label: '🖼',  command: 'customImage',         title: 'Insert Image' },
+            { label: '▶',   command: 'insertVideo',         title: 'Embed Video' },
+            { label: '📂',  command: 'customImport',        title: 'Import Word / Docs' },
+            { label: '▦',   command: 'insertTable',         title: 'Insert Table' },
+            { label: '―',   command: 'insertHorizontalRule', title: 'Horizontal Rule' },
             { type: 'separator' },
+
+            // Utilities — pushed to right end
+            { label: 'Tₓ', command: 'removeFormat',  title: 'Clear Formatting' },
             {
                 type: 'dropdown', label: 'Export', title: 'Export', items: [
-                    { label: 'Markdown', command: 'exportMarkdown' },
-                    { label: 'PDF', command: 'exportPDF' }
+                    { label: '⬇ Markdown', command: 'exportMarkdown' },
+                    { label: '⬇ PDF',      command: 'exportPDF' }
                 ]
             },
-            { type: 'separator' },
-            { label: '🔍', command: 'toggleSearch', title: 'Find & Replace' },
-            { type: 'separator' },
-            { label: '🌙', command: 'toggleTheme', title: 'Toggle Dark Mode' },
-            { type: 'separator' },
-            { label: '&lt;/&gt;', command: 'toggleSource', title: 'View Source' },
-            { type: 'separator' },
-            { label: '⤢', command: 'toggleFullScreen', title: 'Full Screen' }
+            { label: '🔍', command: 'toggleSearch',    title: 'Find & Replace' },
+            { label: '🌙', command: 'toggleTheme',     title: 'Toggle Dark Mode' },
+            { label: '&lt;/&gt;', command: 'toggleSource',    title: 'View HTML Source' },
+            { label: '⤢',  command: 'toggleFullScreen', title: 'Fullscreen' }
         ];
 
-        // Merge custom buttons (v1.4.0)
-        if (this.options.customButtons && Array.isArray(this.options.customButtons)) {
-            if (this.options.customButtons.length > 0) {
-                this.buttons.push({ type: 'separator' });
-                this.options.customButtons.forEach(btn => {
-                    this.buttons.push({
-                        ...btn,
-                        isCustom: true
-                    });
-                });
-            }
+        // Custom buttons
+        if (this.options.customButtons && this.options.customButtons.length > 0) {
+            this.buttons.push({ type: 'separator' });
+            this.options.customButtons.forEach(btn => {
+                this.buttons.push({ ...btn, isCustom: true });
+            });
         }
 
         this.init();
-
         window.addEventListener('resize', () => this.checkOverflow());
     }
 
     init() {
         this.render();
-        // Wait for next frame to ensure elements are in DOM
         requestAnimationFrame(() => this.checkOverflow());
         this.bindEvents();
     }
 
+    // ── Render ──────────────────────────────────────────────────────────────
+
     render() {
         this.container.innerHTML = '';
 
-        this.buttons.forEach(btn => {
-            if (btn.type === 'separator') {
-                const separator = document.createElement('div');
-                separator.className = 'rte-toolbar-divider';
-                this.container.appendChild(separator);
-                return;
-            }
+        // toolbarItems filter
+        const allowedSet = (
+            this.options.toolbarItems &&
+            Array.isArray(this.options.toolbarItems) &&
+            this.options.toolbarItems.length > 0
+        ) ? new Set(this.options.toolbarItems) : null;
 
-            // Handle Select Dropdowns (Fonts, etc.)
-            if (btn.type === 'select') {
-                const wrapper = document.createElement('div');
-                wrapper.className = 'rte-select-wrapper';
+        let visible = this.buttons;
 
-                const select = document.createElement('select');
-                select.title = btn.title || '';
-                select.setAttribute('aria-label', btn.title || btn.label || 'Select option');
-                select.className = 'rte-toolbar-select';
-
-                btn.options.forEach(opt => {
-                    const option = document.createElement('option');
-                    option.value = opt.value;
-                    option.innerText = opt.label;
-                    select.appendChild(option);
-                });
-
-                select.onchange = () => {
-                    this.execute(btn.command, select.value);
-                    // Reset to show label effectively or keep state? 
-                    // Usually font stays, but for now let's keep it simple.
-                };
-
-                wrapper.appendChild(select);
-                this.container.appendChild(wrapper);
-                return;
-            }
-
-            // Handle Color Pickers
-            if (btn.type === 'color') {
-                const wrapper = document.createElement('div');
-                wrapper.className = 'rte-color-picker';
-                wrapper.title = btn.title || '';
-                wrapper.setAttribute('aria-label', btn.title || 'Pick color');
-
-                const label = document.createElement('span');
-                label.innerHTML = btn.label;
-
-                const input = document.createElement('input');
-                input.type = 'color';
-                input.onchange = () => this.execute(btn.command, input.value);
-
-                wrapper.appendChild(label);
-                wrapper.appendChild(input);
-                this.container.appendChild(wrapper);
-                return;
-            }
-
-            // Handle Nested Dropdowns (like Export)
-            if (btn.type === 'dropdown') {
-                const wrapper = document.createElement('div');
-                wrapper.className = 'rte-dropdown-wrapper';
-
-                const button = document.createElement('button');
-                button.className = 'rte-toolbar-btn rte-dropdown-trigger';
-                button.innerHTML = `${btn.label} <span style="font-size:10px;margin-left:4px">▼</span>`;
-                button.title = btn.title || '';
-                button.setAttribute('aria-label', btn.title || btn.label);
-
-                const menu = document.createElement('div');
-                menu.className = 'rte-dropdown-menu';
-
-                btn.items.forEach(item => {
-                    const itemDiv = document.createElement('div');
-                    itemDiv.className = 'rte-dropdown-item';
-                    itemDiv.innerText = item.label;
-                    itemDiv.onclick = () => {
-                        this.execute(item.command);
-                        menu.classList.remove('show');
-                    };
-                    menu.appendChild(itemDiv);
-                });
-
-                button.onclick = (e) => {
-                    e.stopPropagation();
-                    // Close others
-                    this.container.querySelectorAll('.rte-dropdown-menu.show').forEach(m => {
-                        if (m !== menu) m.classList.remove('show');
-                    });
-                    menu.classList.toggle('show');
-                };
-
-                // Close on click outside
-                document.addEventListener('click', (e) => {
-                    if (!wrapper.contains(e.target)) {
-                        menu.classList.remove('show');
-                    }
-                });
-
-                wrapper.appendChild(button);
-                wrapper.appendChild(menu);
-                this.container.appendChild(wrapper);
-                return;
-            }
-
-            const button = document.createElement('button');
-            button.type = 'button';
-            button.className = 'rte-toolbar-btn';
-            button.innerHTML = btn.label;
-            button.title = btn.title || '';
-            button.setAttribute('aria-label', btn.title || btn.label);
-            button.dataset.command = btn.command;
-            if (btn.value) button.dataset.value = btn.value;
-
-            button.addEventListener('click', (e) => {
-                e.preventDefault();
-
-                // Custom Handlers
-                if (['toggleFullScreen', 'insertVideo', 'insertTable', 'toggleSource', 'toggleTheme', 'insertEmoji', 'toggleSearch', 'customImport'].includes(btn.command)) {
-                    if (this.options.onCustomCommand) {
-                        this.options.onCustomCommand(btn.command, null, e.currentTarget);
-                    }
-                    return;
-                }
-
-                let value = btn.value;
-
-                if (btn.needsValue) {
-                    if (btn.command === 'createLink') {
-                        if (this.options.onLinkClick) {
-                            this.options.onLinkClick();
-                            return;
-                        }
-                        // Fallback
-                        value = prompt('Enter Link URL:', 'https://');
-                        if (!value) return; // Cancelled
-                    }
-                }
-
-                if (btn.command === 'customImage') {
-                    if (this.options.onImageClick) {
-                        this.options.onImageClick();
-                    }
-                    return;
-                }
-
-                this.execute(btn.command, value);
+        if (allowedSet) {
+            visible = visible.filter(btn => {
+                if (btn.type === 'separator') return true;
+                if (btn.type === 'dropdown') return btn.items && btn.items.some(i => allowedSet.has(i.command));
+                return allowedSet.has(btn.command);
             });
 
-            // Handle Action for Custom Buttons (v1.4.0)
-            if (btn.isCustom && btn.action) {
-                button.addEventListener('click', (e) => {
-                    // Note: execute() already focused the editor, but we might want to pass control
-                    btn.action(this.options.editorInstance || null); 
-                    // Wait, Toolbar doesn't have editorInstance easily. 
-                    // Let's rely on handleCommand in RichTextEditor instead.
-                });
+            visible = visible.filter((btn, i, arr) => {
+                if (btn.type !== 'separator') return true;
+                const prev = arr[i - 1];
+                const next = arr[i + 1];
+                if (!prev || !next || prev.type === 'separator') return false;
+                return true;
+            });
+        }
+
+        // Split into groups on separators
+        const groups = [[]];
+        visible.forEach(btn => {
+            if (btn.type === 'separator') groups.push([]);
+            else groups[groups.length - 1].push(btn);
+        });
+
+        const nonEmpty = groups.filter(g => g.length > 0);
+
+        nonEmpty.forEach((groupBtns, idx) => {
+            const groupEl = document.createElement('div');
+            groupEl.className = 'rte-btn-group';
+            if (idx === nonEmpty.length - 1 && nonEmpty.length > 1) {
+                groupEl.classList.add('rte-btn-group--end');
             }
 
-            this.container.appendChild(button);
+            groupBtns.forEach(btn => {
+                const el = this._renderItem(btn);
+                if (el) groupEl.appendChild(el);
+            });
+
+            this.container.appendChild(groupEl);
         });
     }
+
+    _renderItem(btn) {
+        if (btn.type === 'select')   return this._renderSelect(btn);
+        if (btn.type === 'color')    return this._renderColor(btn);
+        if (btn.type === 'dropdown') return this._renderDropdown(btn);
+        return this._renderButton(btn);
+    }
+
+    _renderSelect(btn) {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'rte-select-wrapper';
+
+        const select = document.createElement('select');
+        select.className = 'rte-toolbar-select';
+        select.title = btn.title || '';
+        select.setAttribute('aria-label', btn.title || 'Select');
+
+        btn.options.forEach(opt => {
+            const o = document.createElement('option');
+            o.value = opt.value;
+            o.innerText = opt.label;
+            select.appendChild(o);
+        });
+
+        select.onchange = () => this.execute(btn.command, select.value);
+        wrapper.appendChild(select);
+        return wrapper;
+    }
+
+    _renderColor(btn) {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'rte-color-picker';
+        wrapper.title = btn.title || '';
+        wrapper.setAttribute('aria-label', btn.title || 'Color');
+        if (btn.title) wrapper.setAttribute('data-tooltip', btn.title);
+
+        const label = document.createElement('span');
+        label.innerHTML = btn.label;
+
+        const input = document.createElement('input');
+        input.type = 'color';
+        input.onchange = () => this.execute(btn.command, input.value);
+
+        wrapper.appendChild(label);
+        wrapper.appendChild(input);
+        return wrapper;
+    }
+
+    _renderDropdown(btn) {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'rte-dropdown-wrapper';
+
+        const button = document.createElement('button');
+        button.className = 'rte-toolbar-btn rte-dropdown-trigger';
+        button.innerHTML = `${btn.label} <span class="rte-dropdown-arrow">▾</span>`;
+        button.title = btn.title || '';
+        button.setAttribute('aria-label', btn.title || btn.label);
+        if (btn.title) button.setAttribute('data-tooltip', btn.title);
+
+        const menu = document.createElement('div');
+        menu.className = 'rte-dropdown-menu';
+
+        btn.items.forEach(item => {
+            const itemEl = document.createElement('div');
+            itemEl.className = 'rte-dropdown-item';
+            itemEl.innerText = item.label;
+            itemEl.onclick = () => {
+                this.execute(item.command);
+                menu.classList.remove('show');
+            };
+            menu.appendChild(itemEl);
+        });
+
+        button.onclick = (e) => {
+            e.stopPropagation();
+            this.container.querySelectorAll('.rte-dropdown-menu.show').forEach(m => {
+                if (m !== menu) m.classList.remove('show');
+            });
+            menu.classList.toggle('show');
+        };
+
+        document.addEventListener('click', (e) => {
+            if (!wrapper.contains(e.target)) menu.classList.remove('show');
+        });
+
+        wrapper.appendChild(button);
+        wrapper.appendChild(menu);
+        return wrapper;
+    }
+
+    _renderButton(btn) {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'rte-toolbar-btn';
+        button.innerHTML = btn.label;
+        button.title = btn.title || '';
+        button.setAttribute('aria-label', btn.title || btn.label);
+        button.dataset.command = btn.command;
+        if (btn.title) button.setAttribute('data-tooltip', btn.title);
+        if (btn.value) button.dataset.value = btn.value;
+
+        button.addEventListener('click', (e) => {
+            e.preventDefault();
+
+            const customCmds = ['toggleFullScreen', 'insertVideo', 'insertTable', 'toggleSource',
+                                'toggleTheme', 'insertEmoji', 'toggleSearch', 'customImport'];
+            if (customCmds.includes(btn.command)) {
+                if (this.options.onCustomCommand) {
+                    this.options.onCustomCommand(btn.command, null, e.currentTarget);
+                }
+                return;
+            }
+
+            let value = btn.value;
+
+            if (btn.needsValue && btn.command === 'createLink') {
+                if (this.options.onLinkClick) { this.options.onLinkClick(); return; }
+                value = prompt('Enter Link URL:', 'https://');
+                if (!value) return;
+            }
+
+            if (btn.command === 'customImage') {
+                if (this.options.onImageClick) this.options.onImageClick();
+                return;
+            }
+
+            this.execute(btn.command, value);
+        });
+
+        return button;
+    }
+
+    // ── Execute ─────────────────────────────────────────────────────────────
 
     execute(command, value = null) {
         this.editor.focus();
 
-        // Intercept Custom Commands (Font Size, Export, etc.)
         if (['customFontSize', 'exportMarkdown', 'exportPDF'].includes(command)) {
-            if (this.options.onCustomCommand) {
-                // For customFontSize, value is needed. For exports, it might be null.
-                this.options.onCustomCommand(command, value);
-            }
+            if (this.options.onCustomCommand) this.options.onCustomCommand(command, value);
             return;
         }
 
-        // Handle toggling for Block commands (H1, H2, Blockquote)
         if (command === 'formatBlock') {
-            const currentBlock = document.queryCommandValue('formatBlock');
+            const current = document.queryCommandValue('formatBlock');
 
-            // Special Handling for Quotes (Inline <q> vs Block <blockquote>)
             if (value === 'BLOCKQUOTE') {
-                const selection = window.getSelection();
-
-                // 1. Inline Mode: If text is selected, toggle <q> tag
-                if (!selection.isCollapsed) {
-                    const anchorNode = selection.anchorNode;
-                    // Check if we are inside a <q> tag
-                    const qTag = anchorNode.nodeType === 3 ? anchorNode.parentElement.closest('q') : anchorNode.closest('q');
+                const sel = window.getSelection();
+                if (!sel.isCollapsed) {
+                    const anchor = sel.anchorNode;
+                    const qTag = anchor.nodeType === 3
+                        ? anchor.parentElement.closest('q')
+                        : anchor.closest('q');
 
                     if (qTag) {
-                        // UN-QUOTE: Replace the <q> tag with its own content
-                        // We select the whole <q> tag first to ensure we replace the tag itself
                         const range = document.createRange();
                         range.selectNode(qTag);
-                        selection.removeAllRanges();
-                        selection.addRange(range);
+                        sel.removeAllRanges();
+                        sel.addRange(range);
                         document.execCommand('insertHTML', false, qTag.innerHTML);
                     } else {
-                        // QUOTE: Wrap selection in <q>
-                        const selectedText = selection.toString();
-                        document.execCommand('insertHTML', false, `<q>${selectedText}</q>`);
+                        document.execCommand('insertHTML', false, `<q>${sel.toString()}</q>`);
                     }
                     this.updateActiveStates();
                     return;
                 }
             }
 
-            // 2. Block Mode: Use standard behavior (toggle H1, H2, Blockquote)
-            // If we are already in this block type, toggle it off (revert to Paragraph)
-            if (currentBlock && value && currentBlock.toLowerCase() === value.toLowerCase()) {
+            if (current && value && current.toLowerCase() === value.toLowerCase()) {
                 document.execCommand('formatBlock', false, 'P');
                 this.updateActiveStates();
                 return;
             }
         }
 
-        // Handle toggling for Alignment
         if (['justifyLeft', 'justifyCenter', 'justifyRight', 'justifyFull'].includes(command)) {
-            const isAlreadyActive = document.queryCommandState(command);
-            if (isAlreadyActive) {
-                // If clicking the currently active alignment, toggle back to default (Left)
-                // Note: If we are clicking 'justifyLeft' and it's already left, this does nothing visually, which is fine.
-                // But if we click Center when Center is active, we go Left.
+            if (document.queryCommandState(command)) {
                 document.execCommand('justifyLeft', false, null);
                 this.updateActiveStates();
                 return;
@@ -359,59 +345,49 @@ export default class Toolbar {
         this.updateActiveStates();
     }
 
+    // ── Events & State ───────────────────────────────────────────────────────
+
     bindEvents() {
-        // Update toolbar state when selection changes
         document.addEventListener('selectionchange', () => {
-            // Only update if selection is inside our editor
             if (this.editor.contains(window.getSelection().anchorNode)) {
                 this.updateActiveStates();
             }
         });
 
-        this.editor.addEventListener('keyup', () => this.updateActiveStates());
+        this.editor.addEventListener('keyup',   () => this.updateActiveStates());
         this.editor.addEventListener('mouseup', () => this.updateActiveStates());
     }
 
     updateActiveStates() {
-        const buttons = this.container.querySelectorAll('.rte-toolbar-btn');
-
-        buttons.forEach(btn => {
+        this.container.querySelectorAll('.rte-toolbar-btn').forEach(btn => {
             const command = btn.dataset.command;
             if (!command) return;
 
             let isActive = false;
-
-            // Special handling for block commands like H1, H2, Blockquote
             if (command === 'formatBlock') {
-                const value = btn.dataset.value;
-                isActive = document.queryCommandValue(command).toLowerCase() === value.toLowerCase();
+                const val = btn.dataset.value;
+                isActive = document.queryCommandValue(command).toLowerCase() === val.toLowerCase();
             } else {
                 isActive = document.queryCommandState(command);
             }
 
-            if (isActive) {
-                btn.classList.add('active');
-            } else {
-                btn.classList.remove('active');
-            }
+            btn.classList.toggle('active', isActive);
         });
     }
+
     updateButtonIcon(command, icon) {
         const btn = this.container.querySelector(`button[data-command="${command}"]`);
-        if (btn) {
-            btn.innerHTML = icon;
-        }
+        if (btn) btn.innerHTML = icon;
     }
 
     checkOverflow() {
-        // User requested to show all buttons without dropdown
         if (!this.container) return;
-        const elements = Array.from(this.container.children).filter(el => !el.classList.contains('rte-more-wrapper'));
-        elements.forEach(el => {
-            el.style.display = '';
-            el.style.visibility = 'visible';
-        });
-        const existingMore = this.container.querySelector('.rte-more-wrapper');
-        if (existingMore) existingMore.remove();
+        Array.from(this.container.children)
+            .filter(el => !el.classList.contains('rte-more-wrapper'))
+            .forEach(el => {
+                el.style.display = '';
+                el.style.visibility = 'visible';
+            });
+        this.container.querySelector('.rte-more-wrapper')?.remove();
     }
 }
