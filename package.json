@@ -1,17 +1,24 @@
 {
     "name": "@lakshaykumar/rich-text-editor",
-    "version": "1.4.2",
+    "version": "1.5.0",
     "description": "A lightweight, modular, and dependency-free Rich Text Editor built with modern JavaScript.",
-    "main": "src/editor/RichTextEditor.js",
+    "main": "dist/rich-text-editor.esm.js",
+    "module": "dist/rich-text-editor.esm.js",
+    "unpkg": "dist/rich-text-editor.min.js",
     "exports": {
-        ".": "./src/editor/RichTextEditor.js",
-        "./style": "./src/styles/rte.css"
+        ".": {
+            "import": "./dist/rich-text-editor.esm.js",
+            "default": "./dist/rich-text-editor.esm.js"
+        },
+        "./style": "./dist/rte.min.css",
+        "./src": "./src/editor/RichTextEditor.js"
     },
     "type": "module",
     "files": [
         "src",
         "dist",
         "README.md",
+        "CHANGELOG.md",
         "LICENSE"
     ],
     "scripts": {
@@ -40,7 +47,9 @@
         "no-dependencies",
         "context-menu",
         "custom-commands",
-        "wrapping-toolbar"
+        "wrapping-toolbar",
+        "toolbar-restriction",
+        "configurable-toolbar"
     ],
     "author": "Lakshay Kumar",
     "license": "MIT",

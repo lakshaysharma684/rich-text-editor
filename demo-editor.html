@@ -3,91 +3,361 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Advanced Demo — Rich Text Editor v1.4.2</title>
+    <title>Advanced Demo — Rich Text Editor v1.5.0</title>
     <link rel="stylesheet" href="src/styles/rte.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@600;700&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --bg:      #f1f5f9;
+            --surface: #ffffff;
+            --text:    #0f172a;
+            --muted:   #64748b;
+            --border:  #e2e8f0;
+            --primary: #6366f1;
+            --primary-dim: rgba(99,102,241,0.12);
+            color-scheme: light dark;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg:      #0a0f1e;
+                --surface: #111827;
+                --text:    #f1f5f9;
+                --muted:   #94a3b8;
+                --border:  #1e293b;
+                --primary-dim: rgba(99,102,241,0.18);
+            }
+        }
+
+        *, *::before, *::after { box-sizing: border-box; }
+
         body {
             font-family: 'Inter', system-ui, sans-serif;
-            background: #f1f5f9;
+            background: var(--bg);
+            color: var(--text);
             margin: 0;
-            padding: 40px 20px;
-            color: #1e293b;
+            padding: 0;
+            -webkit-font-smoothing: antialiased;
         }
-        .container {
-            max-width: 900px;
-            margin: 0 auto;
-        }
-        .header {
-            text-align: center;
-            margin-bottom: 40px;
-        }
-        h1 {
-            font-weight: 800;
-            font-size: 2.5rem;
-            margin-bottom: 10px;
-            color: #0f172a;
-        }
-        .controls {
+
+        /* Nav */
+        .nav {
+            position: sticky;
+            top: 0;
+            z-index: 200;
+            height: 56px;
             display: flex;
-            gap: 10px;
-            margin-top: 20px;
-            justify-content: center;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 2rem;
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            backdrop-filter: blur(12px);
         }
-        .btn {
-            padding: 10px 20px;
-            border-radius: 8px;
-            font-weight: 600;
-            border: none;
-            cursor: pointer;
-            transition: all 0.2s;
+
+        .nav-brand {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 700;
+            font-size: 1rem;
+            color: var(--primary);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
-        .btn-primary { background: #6366f1; color: white; }
-        .btn-secondary { background: #fff; border: 1px solid #e2e8f0; color: #475569; }
-        
-        .output-box {
-            background: #fff;
-            border: 1px solid #e2e8f0;
-            border-radius: 12px;
-            padding: 20px;
-            margin-top: 30px;
+
+        .version-pill {
+            background: var(--primary);
+            color: #fff;
+            font-size: 0.65rem;
+            font-weight: 700;
+            padding: 2px 7px;
+            border-radius: 99px;
         }
-        textarea#output {
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .nav-links a {
+            color: var(--muted);
+            text-decoration: none;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: color 0.15s;
+        }
+
+        .nav-links a:hover { color: var(--text); }
+
+        /* Layout */
+        .page {
+            max-width: 1040px;
+            margin: 0 auto;
+            padding: 2.5rem 1.5rem 6rem;
+            display: flex;
+            flex-direction: column;
+            gap: 3rem;
+        }
+
+        /* Section */
+        .section-label {
+            font-size: 0.68rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--primary);
+            background: var(--primary-dim);
+            padding: 3px 8px;
+            border-radius: 4px;
+            display: inline-block;
+            margin-bottom: 6px;
+        }
+
+        .section-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin: 0 0 4px;
+            color: var(--text);
+        }
+
+        .section-desc {
+            font-size: 0.855rem;
+            color: var(--muted);
+            margin: 0 0 14px;
+            line-height: 1.5;
+        }
+
+        /* Editor card */
+        .editor-card {
+            background: var(--surface);
+            border-radius: 14px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+            box-shadow: 0 1px 2px rgba(0,0,0,0.04), 0 8px 24px -8px rgba(0,0,0,0.08);
+        }
+
+        /* Output panel */
+        .output-panel {
+            margin-top: 12px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .output-panel-header {
+            padding: 10px 14px;
+            border-bottom: 1px solid var(--border);
+            font-size: 11.5px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: var(--muted);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .output-panel textarea {
             width: 100%;
-            height: 200px;
             border: none;
-            font-family: monospace;
-            font-size: 13px;
-            outline: none;
+            background: var(--bg);
+            color: var(--muted);
+            font-family: 'Fira Code', 'Courier New', monospace;
+            font-size: 12.5px;
+            line-height: 1.6;
+            padding: 14px;
             resize: vertical;
-            background: #f8fafc;
-            padding: 15px;
-            border-radius: 8px;
-            box-sizing: border-box;
+            outline: none;
+            min-height: 120px;
+            display: block;
+        }
+
+        /* Buttons */
+        .btn-row {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 12px;
+        }
+
+        .btn {
+            padding: 8px 18px;
+            border-radius: 7px;
+            font-weight: 600;
+            font-size: 0.855rem;
+            cursor: pointer;
+            border: none;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.15s;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: #fff;
+        }
+
+        .btn-primary:hover {
+            background: #4f46e5;
+            transform: translateY(-1px);
+        }
+
+        .btn-ghost {
+            background: var(--surface);
+            color: var(--text);
+            border: 1px solid var(--border);
+        }
+
+        .btn-ghost:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        /* Code snippet */
+        .code-block {
+            background: #0f172a;
+            color: #e2e8f0;
+            padding: 18px 20px;
+            border-radius: 10px;
+            font-family: 'Fira Code', 'Courier New', monospace;
+            font-size: 13px;
+            line-height: 1.7;
+            overflow-x: auto;
+            margin: 0;
+        }
+
+        .code-block .kw  { color: #93c5fd; }
+        .code-block .str { color: #86efac; }
+        .code-block .cmt { color: #475569; font-style: italic; }
+
+        /* Usage box */
+        .usage-box {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .usage-box-header {
+            padding: 14px 18px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .usage-box-header h3 {
+            margin: 0 0 4px;
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        .usage-box-header p {
+            margin: 0;
+            font-size: 0.84rem;
+            color: var(--muted);
+        }
+
+        .usage-box pre { margin: 0; }
+
+        /* Divider */
+        hr.divider {
+            border: none;
+            border-top: 1px solid var(--border);
+            margin: 0;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>Advanced Developer Demo</h1>
-            <p>Showcasing custom buttons, context menus, and full-width toolbar.</p>
+
+    <!-- Nav -->
+    <nav class="nav">
+        <a href="index.html" class="nav-brand">
+            RTE <span class="version-pill">v1.5.0</span>
+        </a>
+        <div class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="demo-preview.html">Preview</a>
+            <a href="https://github.com/lakshaysharma684/rich-text-editor">GitHub</a>
+        </div>
+    </nav>
+
+    <div class="page">
+
+        <!-- Full editor -->
+        <div>
+            <span class="section-label">Full toolbar</span>
+            <h2 class="section-title">Advanced Editor</h2>
+            <p class="section-desc">All features enabled. Custom context menu (right-click), custom toolbar button (🚀), export, slash menu, table resize.</p>
+            <div class="editor-card">
+                <div id="editor-container">
+                    <h2>Rich Text Editor v1.5.0</h2>
+                    <p>Right-click anywhere to see the <b>custom context menu</b>. Type <code>/</code> to open the slash command palette.</p>
+                    <p>The toolbar now auto-matches your <b>OS dark/light preference</b>. Click 🌙 to manually override.</p>
+                </div>
+            </div>
+            <div class="btn-row">
+                <button class="btn btn-primary" onclick="getHTML()">Get HTML</button>
+                <button class="btn btn-ghost" onclick="editor.clear()">Clear</button>
+            </div>
+            <div class="output-panel">
+                <div class="output-panel-header">
+                    <span>HTML Output</span>
+                </div>
+                <textarea id="output" readonly placeholder="Click 'Get HTML' to see output..."></textarea>
+            </div>
         </div>
 
-        <div id="editor-container">
-            <h2>Rich Text Editor v1.4.2</h2>
-            <p>Right-click anywhere to see the <b>Custom Context Menu</b>.</p>
-            <p>Check the toolbar — it now shows <b>all buttons</b> and wraps to a new line on smaller screens.</p>
+        <hr class="divider">
+
+        <!-- Restricted editor -->
+        <div>
+            <span class="section-label">toolbarItems</span>
+            <h2 class="section-title">Restricted Toolbar</h2>
+            <p class="section-desc">Only bold, italic, underline, bullet list, numbered list, and clear formatting. All other buttons and their separators are hidden automatically.</p>
+            <div class="editor-card">
+                <div id="editor-restricted">
+                    <p>This editor is intentionally minimal. Use it for product descriptions, ingredient lists, or any field where only basic formatting makes sense.</p>
+                </div>
+            </div>
+            <div class="btn-row">
+                <button class="btn btn-primary" onclick="getRestrictedHTML()">Get HTML</button>
+                <button class="btn btn-ghost" onclick="restrictedEditor.clear()">Clear</button>
+            </div>
+            <div class="output-panel">
+                <div class="output-panel-header">
+                    <span>HTML Output</span>
+                </div>
+                <textarea id="output-restricted" readonly placeholder="Click 'Get HTML' to see output..."></textarea>
+            </div>
         </div>
 
-        <div class="controls">
-            <button class="btn btn-primary" onclick="getHTML()">Get HTML Output</button>
-            <button class="btn btn-secondary" onclick="editor.clear()">Clear Content</button>
+        <hr class="divider">
+
+        <!-- Usage -->
+        <div class="usage-box">
+            <div class="usage-box-header">
+                <h3>Usage — <code>toolbarItems</code></h3>
+                <p>Pass an array of command strings. Omit (or pass <code>null</code>) to show all buttons — no behavior change for existing editors.</p>
+            </div>
+            <pre class="code-block"><code><span class="kw">new</span> RichTextEditor(<span class="str">'#indications-rte'</span>, {
+  toolbarItems: [
+    <span class="str">'bold'</span>, <span class="str">'italic'</span>, <span class="str">'underline'</span>,
+    <span class="str">'insertUnorderedList'</span>, <span class="str">'insertOrderedList'</span>,
+    <span class="str">'removeFormat'</span>
+  ]
+});
+
+<span class="cmt">// Full toolbar (default — no change needed)</span>
+<span class="kw">new</span> RichTextEditor(<span class="str">'#blog-editor'</span>, {
+  placeholder: <span class="str">'Start writing...'</span>,
+  enableAutoSave: <span class="kw">true</span>
+});</code></pre>
         </div>
 
-        <div class="output-box">
-            <h3>Raw HTML Output</h3>
-            <textarea id="output" readonly></textarea>
-        </div>
     </div>
 
     <script type="module">
@@ -99,23 +369,33 @@
                 { label: 'Insert Star ⭐', icon: '⭐', action: (editor) => editor.handleCommand('insertHTML', '⭐') },
                 { label: 'Insert Check ✅', icon: '✅', action: (editor) => editor.handleCommand('insertHTML', '✅') },
                 { type: 'divider' },
-                { label: 'Export PDF', icon: '📄', action: (editor) => alert('PDF Exporting...') }
+                { label: 'Export PDF', icon: '📄', action: () => alert('PDF Exporting...') }
             ],
             customButtons: [
-                {
-                    label: '🚀',
-                    title: 'Boost',
-                    command: 'boost',
-                    action: (editor) => editor.handleCommand('insertHTML', '🚀')
-                }
+                { label: '🚀', title: 'Boost', command: 'boost' }
             ]
+        });
+
+        editor.registerCommand('boost', () => {
+            editor.handleCommand('insertHTML', '🚀');
+        });
+
+        const restrictedEditor = new RichTextEditor('#editor-restricted', {
+            placeholder: 'Basic formatting only...',
+            toolbarItems: ['bold', 'italic', 'underline', 'insertUnorderedList', 'insertOrderedList', 'removeFormat']
         });
 
         window.getHTML = () => {
             document.getElementById('output').value = editor.getHTML();
         };
 
+        window.getRestrictedHTML = () => {
+            document.getElementById('output-restricted').value = restrictedEditor.getHTML();
+        };
+
         window.editor = editor;
+        window.restrictedEditor = restrictedEditor;
     </script>
+
 </body>
 </html>
